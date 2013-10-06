@@ -13,6 +13,157 @@
 
 using namespace XTF;
 
+KeyValue::KeyValue(long value)
+{
+    type_ = INTEGER;
+    int_val_ = value;
+}
+
+KeyValue::KeyValue(double value)
+{
+    type_ = DOUBLE;
+    flt_val_ = value;
+}
+
+KeyValue::KeyValue(std::string value)
+{
+    type_ = STRING;
+    str_val_ = value;
+}
+
+KeyValue::KeyValue(std::vector<long> value)
+{
+    type_ = INTEGERLIST;
+    int_list_ = value;
+}
+
+KeyValue::KeyValue(std::vector<double> value)
+{
+    type_ = DOUBLELIST;
+    flt_list_ = value;
+}
+
+KeyValue::KeyValue(std::vector<std::string> value)
+{
+    type_ = STRINGLIST;
+    str_list_ = value;
+}
+
+KeyValue::TYPES KeyValue::Type()
+{
+    return type_;
+}
+
+long KeyValue::IntValue()
+{
+    if (type_ == INTEGER)
+    {
+        return int_val_;
+    }
+    else
+    {
+        throw std::invalid_argument("KeyValue is not an INTEGER type");
+    }
+}
+
+double KeyValue::FltValue()
+{
+    if (type_ == DOUBLE)
+    {
+        return flt_val_;
+    }
+    else
+    {
+        throw std::invalid_argument("KeyValue is not a DOUBLE type");
+    }
+}
+
+std::string KeyValue::StrValue()
+{
+    if (type_ == STRING)
+    {
+        return str_val_;
+    }
+    else
+    {
+        throw std::invalid_argument("KeyValue is not a STRING type");
+    }
+}
+
+std::vector<long> KeyValue::IntListValue()
+{
+    if (type_ == INTEGERLIST)
+    {
+        return int_list_;
+    }
+    else
+    {
+        throw std::invalid_argument("KeyValue is not an INTEGERLIST type");
+    }
+}
+
+std::vector<double> KeyValue::FltListValue()
+{
+    if (type_ == DOUBLELIST)
+    {
+        return flt_list_;
+    }
+    else
+    {
+        throw std::invalid_argument("KeyValue is not a DOUBLELIST type");
+    }
+}
+
+std::vector<std::string> KeyValue::StrListValue()
+{
+    if (type_ == STRINGLIST)
+    {
+        return str_list_;
+    }
+    else
+    {
+        throw std::invalid_argument("KeyValue is not a STRINGLIST type");
+    }
+}
+
+std::string KeyValue::GetStringValue()
+{
+    std::ostringstream strm;
+    strm << "KeyValue type:";
+    if (type_ == INTEGER)
+    {
+        strm << " INTEGER\nvalue: " << int_val_;
+    }
+    else if (type_ == DOUBLE)
+    {
+        strm << " DOUBLE\nvalue: " << flt_val_;
+    }
+    else if (type_ == STRING)
+    {
+        strm << " STRING\nvalue: " << str_val_;
+    }
+    else if (type_ == INTEGERLIST)
+    {
+        strm << " INTEGERLIST\nvalue: " << PrettyPrint(int_list_);
+    }
+    else if (type_ == DOUBLELIST)
+    {
+        strm << " DOUBLELIST\nvalue: " << PrettyPrint(flt_list_);
+    }
+    else if (type_ == STRINGLIST)
+    {
+        strm << " STRINGLIST\nvalue: " << PrettyPrint(str_list_);
+    }
+    return strm.str();
+}
+
+std::ostream& operator<<(std::ostream& strm, KeyValue& keyvalue)
+{
+    strm << keyvalue.GetStringValue();
+    return strm;
+}
+
+
 void State::VerifySize(std::vector<double> element)
 {
     if (data_length == 0 && element.size() != 0)
@@ -47,7 +198,7 @@ State::State(std::vector<double> desiredP, std::vector<double> desiredV, std::ve
     this->timing = timing;
 }
 
-std::ostream& operator<<(std::ostream &strm, const State &state)
+std::ostream& operator<<(std::ostream& strm, State& state)
 {
     strm << "State #" << state.sequence << " at:\nsecs: " << state.timing.tv_sec << "\nnsecs: " << state.timing.tv_nsec << "\ndesired:\nposition:";
     for (unsigned int i = 0; i < state.position_desired.size(); i++)
@@ -78,6 +229,12 @@ std::ostream& operator<<(std::ostream &strm, const State &state)
     for (unsigned int i = 0; i < state.acceleration_actual.size(); i++)
     {
         strm << " " << state.acceleration_actual[i];
+    }
+    strm << "\nextras:";
+    std::map<std::string, KeyValue>::iterator itr;
+    for(itr = state.extras.begin(); itr != state.extras.end(); ++itr)
+    {
+        strm << "\nkey: " << itr->first << " value: " << itr->second;
     }
     return strm;
 }
@@ -148,7 +305,7 @@ Trajectory::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DAT
     }
 }
 
-std::ostream& operator<<(std::ostream &strm, const Trajectory &traj)
+std::ostream& operator<<(std::ostream& strm, Trajectory& traj)
 {
     if (traj.traj_type == traj.GENERATED)
     {

@@ -16,6 +16,56 @@
 namespace XTF
 {
 
+class KeyValue
+{
+
+protected:
+
+    enum TYPES {INTEGER, DOUBLE, STRING, INTEGERLIST, DOUBLELIST, STRINGLIST};
+    TYPES type_;
+    double flt_val_;
+    long int_val_;
+    std::string str_val_;
+    std::vector<double> flt_list_;
+    std::vector<long> int_list_;
+    std::vector<std::string> str_list_;
+
+public:
+
+    KeyValue(long value);
+
+    KeyValue(double value);
+
+    KeyValue(std::string value);
+
+    KeyValue(std::vector<long> value);
+
+    KeyValue(std::vector<double> value);
+
+    KeyValue(std::vector<std::string> value);
+
+    ~KeyValue()
+    {
+    }
+
+    TYPES Type();
+
+    long IntValue();
+
+    double FltValue();
+
+    std::string StrValue();
+
+    std::vector<long> IntListValue();
+
+    std::vector<double> FltListValue();
+
+    std::vector<std::string> StrListValue();
+
+    std::string GetStringValue();
+
+};
+
 class State
 {
 protected:
@@ -30,6 +80,7 @@ public:
     std::vector<double> position_actual;
     std::vector<double> velocity_actual;
     std::vector<double> acceleration_actual;
+    std::map<std::string, KeyValue> extras;
     int sequence;
     timespec timing;
     unsigned int data_length;
@@ -134,8 +185,10 @@ std::string PrettyPrint(std::vector<T> vectoprint);
 template <typename T>
 std::string PrettyPrint(T toprint);
 
-std::ostream& operator<<(std::ostream &strm, const XTF::State &state);
+std::ostream& operator<<(std::ostream& strm, XTF::KeyValue& keyvalue);
 
-std::ostream& operator<<(std::ostream &strm, const XTF::Trajectory &traj);
+std::ostream& operator<<(std::ostream& strm, XTF::State& state);
+
+std::ostream& operator<<(std::ostream& strm, XTF::Trajectory& traj);
 
 #endif // XTF_H
