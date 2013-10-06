@@ -126,40 +126,71 @@ std::vector<std::string> KeyValue::StrListValue()
     }
 }
 
-std::string KeyValue::GetStringValue()
+std::string KeyValue::GetValueString()
 {
     std::ostringstream strm;
-    strm << "KeyValue type:";
     if (type_ == INTEGER)
     {
-        strm << " INTEGER\nvalue: " << int_val_;
+        strm << int_val_;
     }
     else if (type_ == DOUBLE)
     {
-        strm << " DOUBLE\nvalue: " << flt_val_;
+        strm << flt_val_;
     }
     else if (type_ == STRING)
     {
-        strm << " STRING\nvalue: " << str_val_;
+        strm << str_val_;
     }
     else if (type_ == INTEGERLIST)
     {
-        strm << " INTEGERLIST\nvalue: " << PrettyPrint(int_list_);
+        strm << PrettyPrint(int_list_);
     }
     else if (type_ == DOUBLELIST)
     {
-        strm << " DOUBLELIST\nvalue: " << PrettyPrint(flt_list_);
+        strm << PrettyPrint(flt_list_);
     }
     else if (type_ == STRINGLIST)
     {
-        strm << " STRINGLIST\nvalue: " << PrettyPrint(str_list_);
+        strm << PrettyPrint(str_list_);
     }
     return strm.str();
 }
 
+std::string KeyValue::GetTypeString()
+{
+    if (type_ == INTEGER)
+    {
+        return std::string("INTEGER");
+    }
+    else if (type_ == DOUBLE)
+    {
+        return std::string("DOUBLE");
+    }
+    else if (type_ == STRING)
+    {
+        return std::string("STRING");
+    }
+    else if (type_ == INTEGERLIST)
+    {
+        return std::string("INTEGERLIST");
+    }
+    else if (type_ == DOUBLELIST)
+    {
+        return std::string("DOUBLELIST");
+    }
+    else if (type_ == STRINGLIST)
+    {
+        return std::string("STRINGLIST");
+    }
+    else
+    {
+        throw std::invalid_argument("Invalid KeyValue type ID");
+    }
+}
+
 std::ostream& operator<<(std::ostream& strm, KeyValue& keyvalue)
 {
-    strm << keyvalue.GetStringValue();
+    strm << "type: " << keyvalue.GetTypeString() << " value: " << keyvalue.GetValueString();
     return strm;
 }
 
@@ -234,7 +265,7 @@ std::ostream& operator<<(std::ostream& strm, State& state)
     std::map<std::string, KeyValue>::iterator itr;
     for(itr = state.extras.begin(); itr != state.extras.end(); ++itr)
     {
-        strm << "\nkey: " << itr->first << " value: " << itr->second;
+        strm << "\nkey: " << itr->first << " " << itr->second;
     }
     return strm;
 }
@@ -527,6 +558,61 @@ Trajectory Parser::ParseTraj(std::string filename)
                 xmlpp::Node::NodeList actual = ((xmlpp::Node*)*iter)->get_children("actual");
                 xmlpp::Node* actualEL = actual.front();
                 std::vector< std::vector<double> > actualData = ReadStateFields(actualEL);
+                // Get the extras
+                std::map<std::string, KeyValue> extras;
+                xmlpp::Node::NodeList extralist = ((xmlpp::Node*)*iter)->get_children("extra");
+                for (xmlpp::Node::NodeList::iterator xiter = extralist.begin(); xiter != extralist.end(); ++xiter)
+                {
+                    xmlpp::Element* extraElement = dynamic_cast<xmlpp::Element*>(*xiter);
+                    xmlpp::Attribute* nameAttrib = extraElement->get_attribute("name");
+                    xmlpp::Attribute* typeAttrib = extraElement->get_attribute("type");
+                    xmlpp::Attribute* valueAttrib = extraElement->get_attribute("value");
+                    if (nameAttrib && typeAttrib && valueAttrib)
+                    {
+                        std::string real_type(typeAttrib->get_value());
+                        if (real_type.compare("INTEGER") == 0 || real_type.compare("integer") == 0)
+                        {
+                            KeyValue extra(atol(valueAttrib->get_value().c_str()));
+                            extras.insert(std::pair<std::string, KeyValue>(std::string(nameAttrib->get_value()), extra));
+                        }
+                        else if (real_type.compare("DOUBLE") == 0 || real_type.compare("double") == 0)
+                        {
+                            KeyValue extra(atof(valueAttrib->get_value().c_str()));
+                            extras.insert(std::pair<std::string, KeyValue>(std::string(nameAttrib->get_value()), extra));
+                        }
+                        else if (real_type.compare("STRING") == 0 || real_type.compare("string") == 0)
+                        {
+                            KeyValue extra(std::string(valueAttrib->get_value()));
+                            extras.insert(std::pair<std::string, KeyValue>(std::string(nameAttrib->get_value()), extra));
+                        }
+                        else if (real_type.compare("INTEGERLIST") == 0 || real_type.compare("integerlist") == 0)
+                        {
+                            std::vector<long> longs = ReadLongs(std::string(valueAttrib->get_value()));
+                            KeyValue extra(longs);
+                            extras.insert(std::pair<std::string, KeyValue>(std::string(nameAttrib->get_value()), extra));
+                        }
+                        else if (real_type.compare("DOUBLELIST") == 0 || real_type.compare("doublelist") == 0)
+                        {
+                            std::vector<double> doubles = ReadDoubles(std::string(valueAttrib->get_value()));
+                            KeyValue extra(doubles);
+                            extras.insert(std::pair<std::string, KeyValue>(std::string(nameAttrib->get_value()), extra));
+                        }
+                        else if (real_type.compare("STRINGLIST") == 0 || real_type.compare("stringlist") == 0)
+                        {
+                            std::vector<std::string> strings = ReadStrings(std::string(valueAttrib->get_value()));
+                            KeyValue extra(strings);
+                            extras.insert(std::pair<std::string, KeyValue>(std::string(nameAttrib->get_value()), extra));
+                        }
+                        else
+                        {
+                            throw std::invalid_argument("XTF file is malformed or otherwise corrupted - a state contains invalid extra type");
+                        }
+                    }
+                    else
+                    {
+                        throw std::invalid_argument("XTF file is malformed or otherwise corrupted - a state contains invalid extras");
+                    }
+                }
                 // Get the state header data
                 xmlpp::Element* nodeElement = dynamic_cast<xmlpp::Element*>(*iter);
                 xmlpp::Attribute* sequenceAttrib = nodeElement->get_attribute("sequence");
@@ -541,11 +627,12 @@ Trajectory Parser::ParseTraj(std::string filename)
                     timing.tv_sec = secs;
                     timing.tv_nsec = nsecs;
                     State new_state(desiredData[0], desiredData[1], desiredData[2], actualData[0], actualData[1], actualData[2], sequence, timing);
+                    new_state.extras = extras;
                     trajectory_data.push_back(new_state);
                 }
                 else
                 {
-                    throw std::invalid_argument("XTF file is malformed or otherwise corrupted");
+                    throw std::invalid_argument("XTF file is malformed or otherwise corrupted - one of the states is invalid");
                 }
             }
             // Assemble the trajectory
@@ -663,6 +750,14 @@ bool Parser::ExportTraj(Trajectory trajectory, std::string filename, bool compac
         av->set_child_text(PrettyPrint(current.velocity_actual));
         xmlpp::Element* aa = actual->add_child("acceleration");
         aa->set_child_text(PrettyPrint(current.acceleration_actual));
+        std::map<std::string, KeyValue>::iterator itr;
+        for(itr = current.extras.begin(); itr != current.extras.end(); ++itr)
+        {
+            xmlpp::Element* extra = state->add_child("extra");
+            extra->set_attribute("name", itr->first);
+            extra->set_attribute("type", itr->second.GetTypeString());
+            extra->set_attribute("value", itr->second.GetValueString());
+        }
     }
     // Write the xml document to file
     if (compact)
@@ -697,6 +792,18 @@ std::string PrettyPrint(T toprint)
     std::ostringstream strm;
     strm << toprint;
     return strm.str();
+}
+
+std::vector<long> Parser::ReadLongs(std::string strtovec)
+{
+    std::vector<std::string> elements = Parser::ReadStrings(strtovec);
+    std::vector<long> longs;
+    for (unsigned int i = 0; i < elements.size(); i++)
+    {
+        long temp = atol(elements[i].c_str());
+        longs.push_back(temp);
+    }
+    return longs;
 }
 
 std::vector<double> Parser::ReadDoubles(std::string strtovec)

@@ -62,7 +62,9 @@ public:
 
     std::vector<std::string> StrListValue();
 
-    std::string GetStringValue();
+    std::string GetValueString();
+
+    std::string GetTypeString();
 
 };
 
@@ -132,6 +134,8 @@ public:
 class Parser
 {
 protected:
+
+    std::vector<long> ReadLongs(std::string strtovec);
 
     std::vector<double> ReadDoubles(std::string strtovec);
 
