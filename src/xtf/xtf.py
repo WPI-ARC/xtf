@@ -69,6 +69,19 @@ class XTFState:
         else:
             raise AttributeError("Invalid extra type")
 
+    def _get_value(self, value):
+        if (type(value) == type([])):
+            return self._prettyprint(value)
+        else:
+            return str(value)
+
+    def _prettyprint(self, listtoprint):
+        basestr = ""
+        for item in listtoprint:
+            basestr += (", " + str(item))
+        basestr = basestr.lstrip(", ")
+        return basestr
+
     def __str__(self):
         state_str = "State #" + str(self.sequence) + " at:\nsecs: " + str(self.secs) + "\nnsecs: " + str(self.nsecs)
         state_str += "\ndesired:"
@@ -81,7 +94,7 @@ class XTFState:
         state_str += "\nacceleration: " + str(self.acceleration_actual)
         state_str += "\nextras:"
         for key, value in self.extras.iteritems():
-            state_str += "\nkey: " + key + " type: " + self._get_type(value) + " value: " + str(value)
+            state_str += "\nkey: " + key + " type: " + self._get_type(value) + " value: " + self._get_value(value)
         return state_str
 
 class XTFTrajectory:
@@ -192,6 +205,20 @@ class XTFParser:
         basestr = basestr.lstrip(", ")
         return basestr
 
+    def _readints(self, strtolist):
+        if (strtolist is None):
+            return []
+        strtolist = strtolist.strip("\n")
+        chunks = strtolist.split(", ")
+        inted = []
+        for chunk in chunks:
+            try:
+                chunk = self.decimal_regex.sub('', chunk)
+                inted.append(int(float(chunk)))
+            except:
+                pass
+        return inted
+
     def _readfloats(self, strtolist):
         if (strtolist is None):
             return []
@@ -254,8 +281,29 @@ class XTFParser:
             actualP = self._readfloats(aEL.find("position").text)
             actualV = self._readfloats(aEL.find("velocity").text)
             actualA = self._readfloats(aEL.find("acceleration").text)
+            extraELs = state.findall("extra")
+            extras = {}
+            for extraEL in extraELs:
+                name = extraEL.attrib['name']
+                dtype = extraEL.attrib['type']
+                value = extraEL.attrib['value']
+                if (dtype.upper() == "INTEGER"):
+                    extras[name] = int(float(value))
+                elif (dtype.upper() == "DOUBLE"):
+                    extras[name] = float(value)
+                elif (dtype.upper() == "STRING"):
+                    extras[name] = value
+                elif (dtype.upper() == "INTEGERLIST"):
+                    extras[name] = self._readints(value)
+                elif (dtype.upper() == "DOUBLELIST"):
+                    extras[name] = self._readfloats(value)
+                elif (dtype.upper() == "STRINGLIST"):
+                    extras[name] = self._readstrings(value)
+                else:
+                    raise AttributeError("Invalid extra data type")
             state_timing = (secs, nsecs)
             new_state = XTFState(desiredP, desiredV, desiredA, actualP, actualV, actualA, sequence, state_timing)
+            new_state.extras = extras
             trajectory_data.append(new_state)
         # Sanity check
         assert(int(num_states) == len(trajectory_data))
@@ -294,6 +342,8 @@ class XTFParser:
             avEL.text = self._prettyprint(state.velocity_actual)
             aaEL = ET.SubElement(actualEL, "acceleration")
             aaEL.text = self._prettyprint(state.acceleration_actual)
+            for key, value in state.extras.iteritems():
+                exEL = ET.SubElement(stateEL, "extra", {"name":key, "type":state._get_type(value), "value":state._get_value(value)})
         tree = ET.ElementTree(trajEL)
         if (compact):
             tree.write(filename, encoding="utf-8", xml_declaration=True)
