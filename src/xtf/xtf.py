@@ -11,6 +11,7 @@
 
 import xml.etree.ElementTree as ET
 import re
+import math
 
 class XTFState:
 
@@ -32,8 +33,12 @@ class XTFState:
         if (len(timing) == 2):
             self.secs = timing[0]
             self.nsecs = timing[1]
+        elif (len(timing) == 1):
+            self.secs = int(math.floor(timing[0]))
+            self.nsecs = int((timing[0] - math.floor(timing[0])) * 1000000000)
         else:
             raise AttributeError("Incorrect format for timing")
+        self.extras = {}
 
     def _verify_size(self, element):
         if (self._data_length == 0 and len(element) != 0):
@@ -41,6 +46,28 @@ class XTFState:
         elif (len(element) != 0):
             if (self._data_length != len(element)):
                 raise AttributeError("Inconsistent trajectory state fields")
+
+    def _get_type(self, extra):
+        if (type(extra) == type(1)):
+            return "INTEGER"
+        elif (type(extra) == type(1.0)):
+            return "DOUBLE"
+        elif (type(extra) == type("")):
+            return "STRING"
+        elif (type(extra) == type([])):
+            if (len(extra) == 0):
+                raise AttributeError("Invalid extra type")
+            else:
+                if (type(extra[0]) == type(1)):
+                    return "INTEGERLIST"
+                elif (type(extra[0]) == type(1.0)):
+                    return "DOUBLELIST"
+                elif (type(extra[0]) == type("")):
+                    return "STRINGLIST"
+                else:
+                    raise AttributeError("Invalid extra type")
+        else:
+            raise AttributeError("Invalid extra type")
 
     def __str__(self):
         state_str = "State #" + str(self.sequence) + " at:\nsecs: " + str(self.secs) + "\nnsecs: " + str(self.nsecs)
@@ -52,6 +79,9 @@ class XTFState:
         state_str += "\nposition: " + str(self.position_actual)
         state_str += "\nvelocity: " + str(self.velocity_actual)
         state_str += "\nacceleration: " + str(self.acceleration_actual)
+        state_str += "\nextras:"
+        for key, value in self.extras.iteritems():
+            state_str += "\nkey: " + key + " type: " + self._get_type(value) + " value: " + str(value)
         return state_str
 
 class XTFTrajectory:
