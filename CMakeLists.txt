@@ -6,7 +6,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Mo
 find_package(LibXML++ REQUIRED)
 ## Catkin setup
 catkin_python_setup()
-catkin_package(INCLUDE_DIRS include CATKIN_DEPENDS roscpp rospy DEPENDS system_lib)
+catkin_package(INCLUDE_DIRS include LIBRARIES ${PROJECT_NAME} CATKIN_DEPENDS roscpp rospy DEPENDS system_lib LibXML++)
 ## Include both default Catkin headers and LibXML++ headers
 include_directories(include ${catkin_INCLUDE_DIRS} ${LibXML++_INCLUDE_DIRS})
 ## Declare a cpp library
