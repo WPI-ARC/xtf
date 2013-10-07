@@ -197,13 +197,13 @@ std::ostream& operator<<(std::ostream& strm, KeyValue& keyvalue)
 
 void State::VerifySize(std::vector<double> element)
 {
-    if (data_length == 0 && element.size() != 0)
+    if (data_length_ == 0 && element.size() != 0)
     {
-        data_length = element.size();
+        data_length_ = element.size();
     }
     else if (element.size() != 0)
     {
-        if (data_length != element.size())
+        if (data_length_ != element.size())
         {
             throw std::invalid_argument("Inconsistent trajectory state fields");
         }
@@ -212,58 +212,71 @@ void State::VerifySize(std::vector<double> element)
 
 State::State(std::vector<double> desiredP, std::vector<double> desiredV, std::vector<double> desiredA, std::vector<double> actualP, std::vector<double> actualV, std::vector<double> actualA, int sequence, timespec timing)
 {
-    data_length = 0;
+    data_length_ = 0;
     VerifySize(desiredP);
-    position_desired = desiredP;
+    position_desired_ = desiredP;
     VerifySize(desiredV);
-    velocity_desired = desiredV;
+    velocity_desired_ = desiredV;
     VerifySize(desiredA);
-    acceleration_desired = desiredA;
+    acceleration_desired_ = desiredA;
     VerifySize(actualP);
-    position_actual = actualP;
+    position_actual_ = actualP;
     VerifySize(actualV);
-    velocity_actual = actualV;
+    velocity_actual_ = actualV;
     VerifySize(actualA);
-    acceleration_actual = actualA;
-    this->sequence = sequence;
-    this->timing = timing;
+    acceleration_actual_ = actualA;
+    sequence_ = sequence;
+    timing_ = timing;
+}
+
+std::vector<std::string> State::ListExtras()
+{
+    std::vector<std::string> keys;
+    std::map<std::string, KeyValue>::iterator itr;
+    for(itr = extras_.begin(); itr != extras_.end(); ++itr)
+    {
+        std::ostringstream key_stream;
+        key_stream << itr->first;
+        keys.push_back(key_stream.str());
+    }
+    return keys;
 }
 
 std::ostream& operator<<(std::ostream& strm, State& state)
 {
-    strm << "State #" << state.sequence << " at:\nsecs: " << state.timing.tv_sec << "\nnsecs: " << state.timing.tv_nsec << "\ndesired:\nposition:";
-    for (unsigned int i = 0; i < state.position_desired.size(); i++)
+    strm << "State #" << state.sequence_ << " at:\nsecs: " << state.timing_.tv_sec << "\nnsecs: " << state.timing_.tv_nsec << "\ndesired:\nposition:";
+    for (unsigned int i = 0; i < state.position_desired_.size(); i++)
     {
-        strm << " " << state.position_desired[i];
+        strm << " " << state.position_desired_[i];
     }
     strm << "\nvelocity:";
-    for (unsigned int i = 0; i < state.velocity_desired.size(); i++)
+    for (unsigned int i = 0; i < state.velocity_desired_.size(); i++)
     {
-        strm << " " << state.velocity_desired[i];
+        strm << " " << state.velocity_desired_[i];
     }
     strm << "\nacceleration:";
-    for (unsigned int i = 0; i < state.acceleration_desired.size(); i++)
+    for (unsigned int i = 0; i < state.acceleration_desired_.size(); i++)
     {
-        strm << " " << state.acceleration_desired[i];
+        strm << " " << state.acceleration_desired_[i];
     }
     strm << "\nactual:\nposition:";
-    for (unsigned int i = 0; i < state.position_actual.size(); i++)
+    for (unsigned int i = 0; i < state.position_actual_.size(); i++)
     {
-        strm << " " << state.position_actual[i];
+        strm << " " << state.position_actual_[i];
     }
     strm << "\nvelocity:";
-    for (unsigned int i = 0; i < state.velocity_actual.size(); i++)
+    for (unsigned int i = 0; i < state.velocity_actual_.size(); i++)
     {
-        strm << " " << state.velocity_actual[i];
+        strm << " " << state.velocity_actual_[i];
     }
     strm << "\nacceleration:";
-    for (unsigned int i = 0; i < state.acceleration_actual.size(); i++)
+    for (unsigned int i = 0; i < state.acceleration_actual_.size(); i++)
     {
-        strm << " " << state.acceleration_actual[i];
+        strm << " " << state.acceleration_actual_[i];
     }
     strm << "\nextras:";
     std::map<std::string, KeyValue>::iterator itr;
-    for(itr = state.extras.begin(); itr != state.extras.end(); ++itr)
+    for(itr = state.extras_.begin(); itr != state.extras_.end(); ++itr)
     {
         strm << "\nkey: " << itr->first << " " << itr->second;
     }
@@ -272,32 +285,32 @@ std::ostream& operator<<(std::ostream& strm, State& state)
 
 Trajectory::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::string root_frame, std::string target_frame, std::vector<State> trajectory_data, std::vector<std::string> tags)
 {
-    this->robot = robot;
-    this->uid = uid;
-    this->generator = generator;
-    this->root_frame = root_frame;
-    this->target_frame = target_frame;
-    this->tags = tags;
-    this->trajectory = trajectory_data;
-    this->data_type = data_type;
-    this->traj_type = traj_type;
-    this->timing = timing;
+    robot_ = robot;
+    uid_ = uid;
+    generator_ = generator;
+    root_frame_ = root_frame;
+    target_frame_ = target_frame;
+    tags_ = tags;
+    data_type_ = data_type;
+    traj_type_ = traj_type;
+    timing_ = timing;
+    trajectory_ = trajectory_data;
 }
 
 Trajectory::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::vector<std::string> joint_names, std::vector<State> trajectory_data, std::vector<std::string> tags)
 {
-    this->robot = robot;
-    this->uid = uid;
-    this->generator = generator;
-    this->joint_names = joint_names;
-    this->tags = tags;
-    this->trajectory = trajectory_data;
-    this->data_type = data_type;
-    this->traj_type = traj_type;
-    this->timing = timing;
-    if (this->joint_names.size() > 0 && this->trajectory.size() > 0)
+    robot_ = robot;
+    uid_ = uid;
+    generator_ = generator;
+    joint_names_ = joint_names;
+    tags_ = tags;
+    data_type_ = data_type;
+    traj_type_ = traj_type;
+    timing_ = timing;
+    trajectory_ = trajectory_data;
+    if (this->joint_names_.size() > 0 && trajectory_.size() > 0)
     {
-        if (this->joint_names.size() != this->trajectory[0].data_length)
+        if (this->joint_names_.size() != trajectory_[0].data_length_)
         {
             throw std::invalid_argument("Inconsistent joint names and joint data");
         }
@@ -306,86 +319,103 @@ Trajectory::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DAT
 
 Trajectory::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::string root_frame, std::string target_frame, std::vector<std::string> tags)
 {
-    this->robot = robot;
-    this->uid = uid;
-    this->generator = generator;
-    this->root_frame = root_frame;
-    this->target_frame = target_frame;
-    this->tags = tags;
-    this->data_type = data_type;
-    this->traj_type = traj_type;
-    this->timing = timing;
+    robot_ = robot;
+    uid_ = uid;
+    generator_ = generator;
+    root_frame_ = root_frame;
+    target_frame_ = target_frame;
+    tags_ = tags;
+    data_type_ = data_type;
+    traj_type_ = traj_type;
+    timing_ = timing;
 }
 
 Trajectory::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::vector<std::string> joint_names, std::vector<std::string> tags)
 {
-    this->robot = robot;
-    this->uid = uid;
-    this->generator = generator;
-    this->joint_names = joint_names;
-    this->tags = tags;
-    this->data_type = data_type;
-    this->traj_type = traj_type;
-    this->timing = timing;
-    if (this->joint_names.size() > 0 && this->trajectory.size() > 0)
+    robot_ = robot;
+    uid_ = uid;
+    generator_ = generator;
+    joint_names_ = joint_names;
+    tags_ = tags;
+    data_type_ = data_type;
+    traj_type_ = traj_type;
+    timing_ = timing;
+    if (this->joint_names_.size() > 0 && trajectory_.size() > 0)
     {
-        if (this->joint_names.size() != this->trajectory[0].data_length)
+        if (this->joint_names_.size() != trajectory_[0].data_length_)
         {
             throw std::invalid_argument("Inconsistent joint names and joint data");
         }
     }
 }
 
+size_t Trajectory::size()
+{
+    return trajectory_.size();
+}
+
+State Trajectory::operator[](size_t idx)
+{
+    if (idx < trajectory_.size())
+    {
+        return trajectory_[idx];
+    }
+    else
+    {
+        throw std::invalid_argument("Requested index is out of range");
+    }
+}
+
 std::ostream& operator<<(std::ostream& strm, Trajectory& traj)
 {
-    if (traj.traj_type == traj.GENERATED)
+    if (traj.traj_type_ == traj.GENERATED)
     {
         strm << "Generated ";
     }
-    else if (traj.traj_type == traj.RECORDED)
+    else if (traj.traj_type_ == traj.RECORDED)
     {
         strm << "Recorded ";
     }
-    if (traj.data_type == traj.JOINT)
+    if (traj.data_type_ == traj.JOINT)
     {
         strm << "Joint ";
     }
-    else if (traj.data_type == traj.POSE)
+    else if (traj.data_type_ == traj.POSE)
     {
         strm << "Pose ";
     }
-    strm << "Trajectory:\nUID: " << traj.uid;
-    if (traj.data_type == traj.JOINT)
+    strm << "Trajectory:\nUID: " << traj.uid_;
+    if (traj.data_type_ == traj.JOINT)
     {
         strm << "\nJoint names:";
-        for (unsigned int i = 0; i < traj.joint_names.size(); i++)
+        for (unsigned int i = 0; i < traj.joint_names_.size(); i++)
         {
-            strm << " " << traj.joint_names[i];
+            strm << " " << traj.joint_names_[i];
         }
     }
-    else if (traj.data_type == traj.POSE)
+    else if (traj.data_type_ == traj.POSE)
     {
-        strm << "\nRoot frame: " << traj.root_frame;
-        strm << "\nTarget frame: " << traj.target_frame;
+        strm << "\nRoot frame: " << traj.root_frame_;
+        strm << "\nTarget frame: " << traj.target_frame_;
     }
-    strm << "\nRobot: " << traj.robot << "\nGenerator: " << traj.generator;
-    if (traj.timing == traj.TIMED)
+    strm << "\nRobot: " << traj.robot_ << "\nGenerator: " << traj.generator_;
+    if (traj.timing_ == traj.TIMED)
     {
         strm << "\nTiming: timed";
     }
-    else if (traj.timing == traj.UNTIMED)
+    else if (traj.timing_ == traj.UNTIMED)
     {
         strm << "\nTiming: untimed";
     }
     strm << "\nTags:";
-    for (unsigned int i = 0; i < traj.tags.size(); i++)
+    for (unsigned int i = 0; i < traj.tags_.size(); i++)
     {
-        strm << " " << traj.tags[i];
+        strm << " " << traj.tags_[i];
     }
     strm << "\nTrajectory data:";
-    for (unsigned int i = 0; i < traj.trajectory.size(); i++)
+    for (unsigned int i = 0; i < traj.trajectory_.size(); i++)
     {
-        strm << "\n---\n" << traj.trajectory[i];
+        strm << "\n---\n" << traj.trajectory_[i];
     }
     return strm;
 }
@@ -627,7 +657,7 @@ Trajectory Parser::ParseTraj(std::string filename)
                     timing.tv_sec = secs;
                     timing.tv_nsec = nsecs;
                     State new_state(desiredData[0], desiredData[1], desiredData[2], actualData[0], actualData[1], actualData[2], sequence, timing);
-                    new_state.extras = extras;
+                    new_state.extras_ = extras;
                     trajectory_data.push_back(new_state);
                 }
                 else
@@ -670,18 +700,18 @@ bool Parser::ExportTraj(Trajectory trajectory, std::string filename, bool compac
     xmlpp::Document trajXTF;
     // Make root
     xmlpp::Element* root = trajXTF.create_root_node("trajectory");
-    root->set_attribute("uid", trajectory.uid);
+    root->set_attribute("uid", trajectory.uid_);
     // - Make info block
     xmlpp::Element* info = root->add_child("info");
-    info->set_attribute("robot", trajectory.robot);
-    info->set_attribute("generator", trajectory.generator);
+    info->set_attribute("robot", trajectory.robot_);
+    info->set_attribute("generator", trajectory.generator_);
     // -- Make type block
     xmlpp::Element* type = info->add_child("type");
-    if (trajectory.traj_type == Trajectory::GENERATED)
+    if (trajectory.traj_type_ == Trajectory::GENERATED)
     {
         type->set_attribute("traj_type", "generated");
     }
-    else if (trajectory.traj_type == Trajectory::RECORDED)
+    else if (trajectory.traj_type_ == Trajectory::RECORDED)
     {
         type->set_attribute("traj_type", "recorded");
     }
@@ -689,11 +719,11 @@ bool Parser::ExportTraj(Trajectory trajectory, std::string filename, bool compac
     {
         throw std::invalid_argument("Trajectory is invalid/inconsistent");
     }
-    if (trajectory.timing == Trajectory::TIMED)
+    if (trajectory.timing_ == Trajectory::TIMED)
     {
         type->set_attribute("timing", "timed");
     }
-    else if (trajectory.timing == Trajectory::UNTIMED)
+    else if (trajectory.timing_ == Trajectory::UNTIMED)
     {
         type->set_attribute("timing", "untimed");
     }
@@ -702,19 +732,19 @@ bool Parser::ExportTraj(Trajectory trajectory, std::string filename, bool compac
         throw std::invalid_argument("Trajectory is invalid/inconsistent");
     }
     // --- Make type fields
-    if (trajectory.data_type == Trajectory::JOINT)
+    if (trajectory.data_type_ == Trajectory::JOINT)
     {
         type->set_attribute("data_type", "joint");
         xmlpp::Element* joint_names = type->add_child("joint_names");
-        joint_names->set_child_text(PrettyPrint(trajectory.joint_names));
+        joint_names->set_child_text(PrettyPrint(trajectory.joint_names_));
     }
-    else if (trajectory.data_type == Trajectory::POSE)
+    else if (trajectory.data_type_ == Trajectory::POSE)
     {
         type->set_attribute("data_type", "pose");
         xmlpp::Element* root_frame = type->add_child("root_frame");
-        root_frame->set_child_text(trajectory.root_frame);
+        root_frame->set_child_text(trajectory.root_frame_);
         xmlpp::Element* target_frame = type->add_child("target_frame");
-        target_frame->set_child_text(trajectory.target_frame);
+        target_frame->set_child_text(trajectory.target_frame_);
     }
     else
     {
@@ -722,36 +752,36 @@ bool Parser::ExportTraj(Trajectory trajectory, std::string filename, bool compac
     }
     // -- Make tag block
     xmlpp::Element* tags = info->add_child("tags");
-    tags->set_child_text(PrettyPrint(trajectory.tags));
+    tags->set_child_text(PrettyPrint(trajectory.tags_));
     // - Make state block
     xmlpp::Element* states = root->add_child("states");
-    states->set_attribute("length", PrettyPrint(trajectory.trajectory.size()));
+    states->set_attribute("length", PrettyPrint(trajectory.trajectory_.size()));
     // -- Make states
-    for (unsigned int i = 0; i < trajectory.trajectory.size(); i++)
+    for (unsigned int i = 0; i < trajectory.trajectory_.size(); i++)
     {
-        State current = trajectory.trajectory[i];
+        State current = trajectory.trajectory_[i];
         xmlpp::Element* state = states->add_child("state");
-        state->set_attribute("sequence", PrettyPrint(current.sequence));
-        state->set_attribute("secs", PrettyPrint(current.timing.tv_sec));
-        state->set_attribute("nsecs", PrettyPrint(current.timing.tv_nsec));
+        state->set_attribute("sequence", PrettyPrint(current.sequence_));
+        state->set_attribute("secs", PrettyPrint(current.timing_.tv_sec));
+        state->set_attribute("nsecs", PrettyPrint(current.timing_.tv_nsec));
         // --- Make state fields
         xmlpp::Element* desired = state->add_child("desired");
         xmlpp::Element* actual = state->add_child("actual");
         // ---- Fill in the state fields
         xmlpp::Element* dp = desired->add_child("position");
-        dp->set_child_text(PrettyPrint(current.position_desired));
+        dp->set_child_text(PrettyPrint(current.position_desired_));
         xmlpp::Element* dv = desired->add_child("velocity");
-        dv->set_child_text(PrettyPrint(current.velocity_desired));
+        dv->set_child_text(PrettyPrint(current.velocity_desired_));
         xmlpp::Element* da = desired->add_child("acceleration");
-        da->set_child_text(PrettyPrint(current.acceleration_desired));
+        da->set_child_text(PrettyPrint(current.acceleration_desired_));
         xmlpp::Element* ap = actual->add_child("position");
-        ap->set_child_text(PrettyPrint(current.position_actual));
+        ap->set_child_text(PrettyPrint(current.position_actual_));
         xmlpp::Element* av = actual->add_child("velocity");
-        av->set_child_text(PrettyPrint(current.velocity_actual));
+        av->set_child_text(PrettyPrint(current.velocity_actual_));
         xmlpp::Element* aa = actual->add_child("acceleration");
-        aa->set_child_text(PrettyPrint(current.acceleration_actual));
+        aa->set_child_text(PrettyPrint(current.acceleration_actual_));
         std::map<std::string, KeyValue>::iterator itr;
-        for(itr = current.extras.begin(); itr != current.extras.end(); ++itr)
+        for(itr = current.extras_.begin(); itr != current.extras_.end(); ++itr)
         {
             xmlpp::Element* extra = state->add_child("extra");
             extra->set_attribute("name", itr->first);

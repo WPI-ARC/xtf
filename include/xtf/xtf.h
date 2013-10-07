@@ -44,6 +44,10 @@ public:
 
     KeyValue(std::vector<std::string> value);
 
+    KeyValue()
+    {
+    }
+
     ~KeyValue()
     {
     }
@@ -76,22 +80,28 @@ protected:
 
 public:
 
-    std::vector<double> position_desired;
-    std::vector<double> velocity_desired;
-    std::vector<double> acceleration_desired;
-    std::vector<double> position_actual;
-    std::vector<double> velocity_actual;
-    std::vector<double> acceleration_actual;
-    std::map<std::string, KeyValue> extras;
-    int sequence;
-    timespec timing;
-    unsigned int data_length;
+    std::vector<double> position_desired_;
+    std::vector<double> velocity_desired_;
+    std::vector<double> acceleration_desired_;
+    std::vector<double> position_actual_;
+    std::vector<double> velocity_actual_;
+    std::vector<double> acceleration_actual_;
+    std::map<std::string, KeyValue> extras_;
+    int sequence_;
+    timespec timing_;
+    unsigned int data_length_;
 
     State(std::vector<double> desiredP, std::vector<double> desiredV, std::vector<double> desiredA, std::vector<double> actualP, std::vector<double> actualV, std::vector<double> actualA, int sequence, timespec timing);
+
+    State()
+    {
+    }
 
     ~State()
     {
     }
+
+    std::vector<std::string> ListExtras();
 
 };
 
@@ -105,17 +115,17 @@ public:
     enum TRAJTYPES {GENERATED, RECORDED};
     enum DATATYPES {JOINT, POSE};
 
-    std::string robot;
-    std::string generator;
-    std::vector<std::string> joint_names;
-    std::string root_frame;
-    std::string target_frame;
-    std::vector<std::string> tags;
-    std::vector<State> trajectory;
-    std::string uid;
-    TIMINGS timing;
-    TRAJTYPES traj_type;
-    DATATYPES data_type;
+    std::string robot_;
+    std::string generator_;
+    std::vector<std::string> joint_names_;
+    std::string root_frame_;
+    std::string target_frame_;
+    std::vector<std::string> tags_;
+    std::vector<State> trajectory_;
+    std::string uid_;
+    TIMINGS timing_;
+    TRAJTYPES traj_type_;
+    DATATYPES data_type_;
 
     Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::string root_frame, std::string target_frame, std::vector<State> trajectory_data, std::vector<std::string> tags);
 
@@ -125,9 +135,17 @@ public:
 
     Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::vector<std::string> joint_names, std::vector<std::string> tags);
 
+    Trajectory()
+    {
+    }
+
     ~Trajectory()
     {
     }
+
+    State operator[](size_t idx);
+
+    size_t size();
 
 };
 
