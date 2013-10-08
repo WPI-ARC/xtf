@@ -221,7 +221,7 @@ class XTFParser:
         return basestr
 
     def _readbools(self, strtolist):
-        if (strtolist is None):
+        if (strtolist == None):
             return []
         strtolist = strtolist.strip("\n")
         chunks = strtolist.split(", ")
@@ -237,7 +237,7 @@ class XTFParser:
         return booled
 
     def _readints(self, strtolist):
-        if (strtolist is None):
+        if (strtolist == None):
             return []
         strtolist = strtolist.strip("\n")
         chunks = strtolist.split(", ")
@@ -251,7 +251,7 @@ class XTFParser:
         return inted
 
     def _readfloats(self, strtolist):
-        if (strtolist is None):
+        if (strtolist == None):
             return []
         strtolist = strtolist.strip("\n")
         chunks = strtolist.split(", ")
@@ -265,7 +265,7 @@ class XTFParser:
         return floated
 
     def _readstrings(self, strtolist):
-        if (strtolist is None):
+        if (strtolist == None):
             return []
         strtolist = strtolist.strip("\n")
         raw_chunks = strtolist.split(", ")
