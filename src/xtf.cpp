@@ -408,9 +408,9 @@ Trajectory::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DAT
     traj_type_ = traj_type;
     timing_ = timing;
     trajectory_ = trajectory_data;
-    if (this->joint_names_.size() > 0 && trajectory_.size() > 0)
+    if (joint_names_.size() > 0 && trajectory_.size() > 0)
     {
-        if (this->joint_names_.size() != trajectory_[0].data_length_)
+        if (joint_names_.size() != trajectory_[0].data_length_)
         {
             throw std::invalid_argument("Inconsistent joint names and joint data");
         }
@@ -440,9 +440,9 @@ Trajectory::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DAT
     data_type_ = data_type;
     traj_type_ = traj_type;
     timing_ = timing;
-    if (this->joint_names_.size() > 0 && trajectory_.size() > 0)
+    if (joint_names_.size() > 0 && trajectory_.size() > 0)
     {
-        if (this->joint_names_.size() != trajectory_[0].data_length_)
+        if (joint_names_.size() != trajectory_[0].data_length_)
         {
             throw std::invalid_argument("Inconsistent joint names and joint data");
         }
@@ -456,7 +456,14 @@ size_t Trajectory::size()
 
 void Trajectory::push_back(State val)
 {
-    trajectory_.push_back(val);
+    if (joint_names_.size() != val.data_length_)
+    {
+        throw std::invalid_argument("Inconsistent joint names and joint data");
+    }
+    else
+    {
+        trajectory_.push_back(val);
+    }
 }
 
 State Trajectory::at(size_t idx)

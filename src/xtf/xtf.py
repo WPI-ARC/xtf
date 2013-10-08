@@ -48,7 +48,9 @@ class XTFState:
                 raise AttributeError("Inconsistent trajectory state fields")
 
     def _get_type(self, extra):
-        if (type(extra) == type(1)):
+        if (type(extra) == type(True)):
+            return "BOOLEAN"
+        elif (type(extra) == type(1)):
             return "INTEGER"
         elif (type(extra) == type(1.0)):
             return "DOUBLE"
@@ -56,9 +58,11 @@ class XTFState:
             return "STRING"
         elif (type(extra) == type([])):
             if (len(extra) == 0):
-                raise AttributeError("Invalid extra type")
+                return "STRINGLIST"
             else:
-                if (type(extra[0]) == type(1)):
+                if (type(extra[0]) == type(True)):
+                    return "BOOLEANLIST"
+                elif (type(extra[0]) == type(1)):
                     return "INTEGERLIST"
                 elif (type(extra[0]) == type(1.0)):
                     return "DOUBLELIST"
@@ -72,17 +76,29 @@ class XTFState:
     def _get_value(self, value):
         if (type(value) == type([])):
             return self._prettyprint(value)
+        elif (type(value) == type(True)):
+            if (value):
+                return "TRUE"
+            else:
+                return "FALSE"
         else:
             return str(value)
 
     def _prettyprint(self, listtoprint):
         basestr = ""
         for item in listtoprint:
-            basestr += (", " + str(item))
+            if (type(item) == type(True)):
+                if (item):
+                    basestr += ", TRUE"
+                else:
+                    basestr += ", FALSE"
+            else:
+                basestr += (", " + str(item))
         basestr = basestr.lstrip(", ")
         return basestr
 
     def __str__(self):
+        print self.extras
         state_str = "State #" + str(self.sequence) + " at:\nsecs: " + str(self.secs) + "\nnsecs: " + str(self.nsecs)
         state_str += "\ndesired:"
         state_str += "\nposition: " + str(self.position_desired)
@@ -205,6 +221,22 @@ class XTFParser:
         basestr = basestr.lstrip(", ")
         return basestr
 
+    def _readbools(self, strtolist):
+        if (strtolist is None):
+            return []
+        strtolist = strtolist.strip("\n")
+        chunks = strtolist.split(", ")
+        booled = []
+        for chunk in chunks:
+            try:
+                if (chunk.upper() == "TRUE"):
+                    booled.append(True)
+                else:
+                    booled.append(False)
+            except:
+                pass
+        return booled
+
     def _readints(self, strtolist):
         if (strtolist is None):
             return []
@@ -287,12 +319,19 @@ class XTFParser:
                 name = extraEL.attrib['name']
                 dtype = extraEL.attrib['type']
                 value = extraEL.attrib['value']
-                if (dtype.upper() == "INTEGER"):
+                if (dtype.upper() == "BOOLEAN"):
+                    if (value.upper() == "TRUE"):
+                        extras[name] = True
+                    else:
+                        extras[name] = False
+                elif (dtype.upper() == "INTEGER"):
                     extras[name] = int(float(value))
                 elif (dtype.upper() == "DOUBLE"):
                     extras[name] = float(value)
                 elif (dtype.upper() == "STRING"):
                     extras[name] = value
+                elif (dtype.upper() == "BOOLEANLIST"):
+                    extras[name] = self._readbools(value)
                 elif (dtype.upper() == "INTEGERLIST"):
                     extras[name] = self._readints(value)
                 elif (dtype.upper() == "DOUBLELIST"):
