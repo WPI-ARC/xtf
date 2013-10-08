@@ -98,7 +98,6 @@ class XTFState:
         return basestr
 
     def __str__(self):
-        print self.extras
         state_str = "State #" + str(self.sequence) + " at:\nsecs: " + str(self.secs) + "\nnsecs: " + str(self.nsecs)
         state_str += "\ndesired:"
         state_str += "\nposition: " + str(self.position_desired)
