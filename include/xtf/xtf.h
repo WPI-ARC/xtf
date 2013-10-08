@@ -21,22 +21,28 @@ class KeyValue
 
 protected:
 
-    enum TYPES {INTEGER, DOUBLE, STRING, INTEGERLIST, DOUBLELIST, STRINGLIST};
+    enum TYPES {BOOLEAN, INTEGER, DOUBLE, STRING, BOOLEANLIST, INTEGERLIST, DOUBLELIST, STRINGLIST};
     TYPES type_;
+    bool bool_val_;
     double flt_val_;
     long int_val_;
     std::string str_val_;
+    std::vector<bool> bool_list_;
     std::vector<double> flt_list_;
     std::vector<long> int_list_;
     std::vector<std::string> str_list_;
 
 public:
 
+    KeyValue(bool value);
+
     KeyValue(long value);
 
     KeyValue(double value);
 
     KeyValue(std::string value);
+
+    KeyValue(std::vector<bool> value);
 
     KeyValue(std::vector<long> value);
 
@@ -54,17 +60,37 @@ public:
 
     TYPES Type();
 
-    long IntValue();
+    void SetValue(bool value);
 
-    double FltValue();
+    void SetValue(long value);
 
-    std::string StrValue();
+    void SetValue(double value);
 
-    std::vector<long> IntListValue();
+    void SetValue(std::string value);
 
-    std::vector<double> FltListValue();
+    void SetValue(std::vector<bool> value);
 
-    std::vector<std::string> StrListValue();
+    void SetValue(std::vector<long> value);
+
+    void SetValue(std::vector<double> value);
+
+    void SetValue(std::vector<std::string> value);
+
+    bool BoolValue();
+
+    long IntegerValue();
+
+    double DoubleValue();
+
+    std::string StringValue();
+
+    std::vector<bool> BoolListValue();
+
+    std::vector<long> IntegerListValue();
+
+    std::vector<double> DoubleListValue();
+
+    std::vector<std::string> StringListValue();
 
     std::string GetValueString();
 
@@ -143,6 +169,10 @@ public:
     {
     }
 
+    void push_back(State val);
+
+    State at(size_t idx);
+
     State operator[](size_t idx);
 
     size_t size();
@@ -152,6 +182,8 @@ public:
 class Parser
 {
 protected:
+
+    std::vector<bool> ReadBools(std::string strtovec);
 
     std::vector<long> ReadLongs(std::string strtovec);
 
@@ -201,8 +233,12 @@ public:
 
 }
 
+std::string PrettyPrintBool(std::vector<bool> vectoprint);
+
 template <typename T>
 std::string PrettyPrint(std::vector<T> vectoprint);
+
+std::string PrettyPrintBool(bool toprint);
 
 template <typename T>
 std::string PrettyPrint(T toprint);

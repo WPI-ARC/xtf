@@ -13,6 +13,12 @@
 
 using namespace XTF;
 
+KeyValue::KeyValue(bool value)
+{
+    type_ = BOOLEAN;
+    bool_val_ = value;
+}
+
 KeyValue::KeyValue(long value)
 {
     type_ = INTEGER;
@@ -29,6 +35,12 @@ KeyValue::KeyValue(std::string value)
 {
     type_ = STRING;
     str_val_ = value;
+}
+
+KeyValue::KeyValue(std::vector<bool> value)
+{
+    type_ = BOOLEANLIST;
+    bool_list_ = value;
 }
 
 KeyValue::KeyValue(std::vector<long> value)
@@ -54,7 +66,67 @@ KeyValue::TYPES KeyValue::Type()
     return type_;
 }
 
-long KeyValue::IntValue()
+void KeyValue::SetValue(bool value)
+{
+    type_ = BOOLEAN;
+    bool_val_ = value;
+}
+
+void KeyValue::SetValue(long value)
+{
+    type_ = INTEGER;
+    int_val_ = value;
+}
+
+void KeyValue::SetValue(double value)
+{
+    type_ = DOUBLE;
+    flt_val_ = value;
+}
+
+void KeyValue::SetValue(std::string value)
+{
+    type_ = STRING;
+    str_val_ = value;
+}
+
+void KeyValue::SetValue(std::vector<bool> value)
+{
+    type_ = BOOLEANLIST;
+    bool_list_ = value;
+}
+
+void KeyValue::SetValue(std::vector<long> value)
+{
+    type_ = INTEGERLIST;
+    int_list_ = value;
+}
+
+void KeyValue::SetValue(std::vector<double> value)
+{
+    type_ = DOUBLELIST;
+    flt_list_ = value;
+}
+
+void KeyValue::SetValue(std::vector<std::string> value)
+{
+    type_ = STRINGLIST;
+    str_list_ = value;
+}
+
+bool KeyValue::BoolValue()
+{
+    if (type_ == BOOLEAN)
+    {
+        return bool_val_;
+    }
+    else
+    {
+        throw std::invalid_argument("KeyValue is not a BOOLEAN type");
+    }
+}
+
+long KeyValue::IntegerValue()
 {
     if (type_ == INTEGER)
     {
@@ -66,7 +138,7 @@ long KeyValue::IntValue()
     }
 }
 
-double KeyValue::FltValue()
+double KeyValue::DoubleValue()
 {
     if (type_ == DOUBLE)
     {
@@ -78,7 +150,7 @@ double KeyValue::FltValue()
     }
 }
 
-std::string KeyValue::StrValue()
+std::string KeyValue::StringValue()
 {
     if (type_ == STRING)
     {
@@ -90,7 +162,19 @@ std::string KeyValue::StrValue()
     }
 }
 
-std::vector<long> KeyValue::IntListValue()
+std::vector<bool> KeyValue::BoolListValue()
+{
+    if (type_ == BOOLEANLIST)
+    {
+        return bool_list_;
+    }
+    else
+    {
+        throw std::invalid_argument("KeyValue is not a BOOLEANLIST type");
+    }
+}
+
+std::vector<long> KeyValue::IntegerListValue()
 {
     if (type_ == INTEGERLIST)
     {
@@ -102,7 +186,7 @@ std::vector<long> KeyValue::IntListValue()
     }
 }
 
-std::vector<double> KeyValue::FltListValue()
+std::vector<double> KeyValue::DoubleListValue()
 {
     if (type_ == DOUBLELIST)
     {
@@ -114,7 +198,7 @@ std::vector<double> KeyValue::FltListValue()
     }
 }
 
-std::vector<std::string> KeyValue::StrListValue()
+std::vector<std::string> KeyValue::StringListValue()
 {
     if (type_ == STRINGLIST)
     {
@@ -129,7 +213,11 @@ std::vector<std::string> KeyValue::StrListValue()
 std::string KeyValue::GetValueString()
 {
     std::ostringstream strm;
-    if (type_ == INTEGER)
+    if (type_ == BOOLEAN)
+    {
+        strm << PrettyPrintBool(bool_val_);
+    }
+    else if (type_ == INTEGER)
     {
         strm << int_val_;
     }
@@ -140,6 +228,10 @@ std::string KeyValue::GetValueString()
     else if (type_ == STRING)
     {
         strm << str_val_;
+    }
+    else if (type_ == BOOLEANLIST)
+    {
+        strm << PrettyPrintBool(bool_list_);
     }
     else if (type_ == INTEGERLIST)
     {
@@ -158,7 +250,11 @@ std::string KeyValue::GetValueString()
 
 std::string KeyValue::GetTypeString()
 {
-    if (type_ == INTEGER)
+    if (type_ == BOOLEAN)
+    {
+        return std::string("BOOLEAN");
+    }
+    else if (type_ == INTEGER)
     {
         return std::string("INTEGER");
     }
@@ -169,6 +265,10 @@ std::string KeyValue::GetTypeString()
     else if (type_ == STRING)
     {
         return std::string("STRING");
+    }
+    else if (type_ == BOOLEANLIST)
+    {
+        return std::string("BOOLEANLIST");
     }
     else if (type_ == INTEGERLIST)
     {
@@ -354,6 +454,25 @@ size_t Trajectory::size()
     return trajectory_.size();
 }
 
+void Trajectory::push_back(State val)
+{
+    trajectory_.push_back(val);
+}
+
+State Trajectory::at(size_t idx)
+{
+    if (idx < trajectory_.size())
+    {
+        return trajectory_[idx];
+    }
+    else
+    {
+        std::ostringstream error_stream;
+        error_stream << "Index " << idx << " is out of range";
+        throw std::out_of_range(error_stream.str());
+    }
+}
+
 State Trajectory::operator[](size_t idx)
 {
     if (idx < trajectory_.size())
@@ -362,7 +481,9 @@ State Trajectory::operator[](size_t idx)
     }
     else
     {
-        throw std::invalid_argument("Requested index is out of range");
+        std::ostringstream error_stream;
+        error_stream << "Index " << idx << " is out of range";
+        throw std::out_of_range(error_stream.str());
     }
 }
 
@@ -600,7 +721,18 @@ Trajectory Parser::ParseTraj(std::string filename)
                     if (nameAttrib && typeAttrib && valueAttrib)
                     {
                         std::string real_type(typeAttrib->get_value());
-                        if (real_type.compare("INTEGER") == 0 || real_type.compare("integer") == 0)
+                        if (real_type.compare("BOOLEAN") == 0 || real_type.compare("boolean") == 0)
+                        {
+                            bool value = false;
+                            std::string value_string(valueAttrib->get_value());
+                            if (value_string.compare("TRUE") == 0 || value_string.compare("true") == 0 || value_string.compare("1") == 0)
+                            {
+                                value = true;
+                            }
+                            KeyValue extra(value);
+                            extras.insert(std::pair<std::string, KeyValue>(std::string(nameAttrib->get_value()), extra));
+                        }
+                        else if (real_type.compare("INTEGER") == 0 || real_type.compare("integer") == 0)
                         {
                             KeyValue extra(atol(valueAttrib->get_value().c_str()));
                             extras.insert(std::pair<std::string, KeyValue>(std::string(nameAttrib->get_value()), extra));
@@ -613,6 +745,12 @@ Trajectory Parser::ParseTraj(std::string filename)
                         else if (real_type.compare("STRING") == 0 || real_type.compare("string") == 0)
                         {
                             KeyValue extra(std::string(valueAttrib->get_value()));
+                            extras.insert(std::pair<std::string, KeyValue>(std::string(nameAttrib->get_value()), extra));
+                        }
+                        else if (real_type.compare("BOOLEANLIST") == 0 || real_type.compare("booleanlist") == 0)
+                        {
+                            std::vector<bool> bools = ReadBools(std::string(valueAttrib->get_value()));
+                            KeyValue extra(bools);
                             extras.insert(std::pair<std::string, KeyValue>(std::string(nameAttrib->get_value()), extra));
                         }
                         else if (real_type.compare("INTEGERLIST") == 0 || real_type.compare("integerlist") == 0)
@@ -801,6 +939,20 @@ bool Parser::ExportTraj(Trajectory trajectory, std::string filename, bool compac
     return true;
 }
 
+std::string PrettyPrintBool(std::vector<bool> vectoprint)
+{
+    std::ostringstream strm;
+    if (vectoprint.size() > 0)
+    {
+        strm << PrettyPrintBool(vectoprint[0]);
+        for (unsigned int i = 1; i < vectoprint.size(); i++)
+        {
+            strm << ", " << PrettyPrintBool(vectoprint[i]);
+        }
+    }
+    return strm.str();
+}
+
 template <typename T>
 std::string PrettyPrint(std::vector<T> vectoprint)
 {
@@ -816,12 +968,40 @@ std::string PrettyPrint(std::vector<T> vectoprint)
     return strm.str();
 }
 
+std::string PrettyPrintBool(bool toprint)
+{
+    if (toprint)
+    {
+        return std::string("TRUE");
+    }
+    else
+    {
+        return std::string("FALSE");
+    }
+}
+
 template <typename T>
 std::string PrettyPrint(T toprint)
 {
     std::ostringstream strm;
     strm << toprint;
     return strm.str();
+}
+
+std::vector<bool> Parser::ReadBools(std::string strtovec)
+{
+    std::vector<std::string> elements = Parser::ReadStrings(strtovec);
+    std::vector<bool> bools;
+    for (unsigned int i = 0; i < elements.size(); i++)
+    {
+        bool temp = false;
+        if (elements[i].compare("TRUE") == 0 || elements[i].compare("true") == 0 || elements[i].compare("1") == 0)
+        {
+            temp = true;
+        }
+        bools.push_back(temp);
+    }
+    return bools;
 }
 
 std::vector<long> Parser::ReadLongs(std::string strtovec)
