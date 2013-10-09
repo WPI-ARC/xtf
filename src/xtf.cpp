@@ -252,35 +252,35 @@ std::string KeyValue::GetTypeString()
 {
     if (type_ == BOOLEAN)
     {
-        return std::string("BOOLEAN");
+        return std::string("boolean");
     }
     else if (type_ == INTEGER)
     {
-        return std::string("INTEGER");
+        return std::string("integer");
     }
     else if (type_ == DOUBLE)
     {
-        return std::string("DOUBLE");
+        return std::string("double");
     }
     else if (type_ == STRING)
     {
-        return std::string("STRING");
+        return std::string("string");
     }
     else if (type_ == BOOLEANLIST)
     {
-        return std::string("BOOLEANLIST");
+        return std::string("booleanlist");
     }
     else if (type_ == INTEGERLIST)
     {
-        return std::string("INTEGERLIST");
+        return std::string("integerlist");
     }
     else if (type_ == DOUBLELIST)
     {
-        return std::string("DOUBLELIST");
+        return std::string("doublelist");
     }
     else if (type_ == STRINGLIST)
     {
-        return std::string("STRINGLIST");
+        return std::string("stringlist");
     }
     else
     {
@@ -979,11 +979,11 @@ std::string PrettyPrintBool(bool toprint)
 {
     if (toprint)
     {
-        return std::string("TRUE");
+        return std::string("true");
     }
     else
     {
-        return std::string("FALSE");
+        return std::string("false");
     }
 }
 

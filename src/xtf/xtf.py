@@ -9,9 +9,11 @@
 #                                               #
 #################################################
 
+import xml.dom.minidom as MD
 import xml.etree.ElementTree as ET
 import re
 import math
+import StringIO
 
 class XTFState:
 
@@ -49,25 +51,25 @@ class XTFState:
 
     def _get_type(self, extra):
         if (type(extra) == type(True)):
-            return "BOOLEAN"
+            return "boolean"
         elif (type(extra) == type(1)):
-            return "INTEGER"
+            return "integer"
         elif (type(extra) == type(1.0)):
-            return "DOUBLE"
+            return "double"
         elif (type(extra) == type("")):
-            return "STRING"
+            return "string"
         elif (type(extra) == type([])):
             if (len(extra) == 0):
-                return "STRINGLIST"
+                return "stringlist"
             else:
                 if (type(extra[0]) == type(True)):
-                    return "BOOLEANLIST"
+                    return "booleanlist"
                 elif (type(extra[0]) == type(1)):
-                    return "INTEGERLIST"
+                    return "integerlist"
                 elif (type(extra[0]) == type(1.0)):
-                    return "DOUBLELIST"
+                    return "doublelist"
                 elif (type(extra[0]) == type("")):
-                    return "STRINGLIST"
+                    return "stringlist"
                 else:
                     raise AttributeError("Invalid extra type")
         else:
@@ -78,9 +80,9 @@ class XTFState:
             return self._prettyprint(value)
         elif (type(value) == type(True)):
             if (value):
-                return "TRUE"
+                return "true"
             else:
-                return "FALSE"
+                return "false"
         else:
             return str(value)
 
@@ -89,9 +91,9 @@ class XTFState:
         for item in listtoprint:
             if (type(item) == type(True)):
                 if (item):
-                    basestr += ", TRUE"
+                    basestr += ", true"
                 else:
-                    basestr += ", FALSE"
+                    basestr += ", false"
             else:
                 basestr += (", " + str(item))
         basestr = basestr.lstrip(", ")
@@ -228,7 +230,7 @@ class XTFParser:
         booled = []
         for chunk in chunks:
             try:
-                if (chunk.upper() == "TRUE"):
+                if (chunk.lower() == "true"):
                     booled.append(True)
                 else:
                     booled.append(False)
@@ -318,24 +320,24 @@ class XTFParser:
                 name = extraEL.attrib['name']
                 dtype = extraEL.attrib['type']
                 value = extraEL.attrib['value']
-                if (dtype.upper() == "BOOLEAN"):
-                    if (value.upper() == "TRUE"):
+                if (dtype.lower() == "boolean"):
+                    if (value.lower() == "true"):
                         extras[name] = True
                     else:
                         extras[name] = False
-                elif (dtype.upper() == "INTEGER"):
+                elif (dtype.lower() == "integer"):
                     extras[name] = int(float(value))
-                elif (dtype.upper() == "DOUBLE"):
+                elif (dtype.lower() == "double"):
                     extras[name] = float(value)
-                elif (dtype.upper() == "STRING"):
+                elif (dtype.lower() == "string"):
                     extras[name] = value
-                elif (dtype.upper() == "BOOLEANLIST"):
+                elif (dtype.lower() == "booleanlist"):
                     extras[name] = self._readbools(value)
-                elif (dtype.upper() == "INTEGERLIST"):
+                elif (dtype.lower() == "integerlist"):
                     extras[name] = self._readints(value)
-                elif (dtype.upper() == "DOUBLELIST"):
+                elif (dtype.lower() == "doublelist"):
                     extras[name] = self._readfloats(value)
-                elif (dtype.upper() == "STRINGLIST"):
+                elif (dtype.lower() == "stringlist"):
                     extras[name] = self._readstrings(value)
                 else:
                     raise AttributeError("Invalid extra data type")
@@ -348,7 +350,7 @@ class XTFParser:
         new_traj = XTFTrajectory(uid, traj_type, timing, data_type, robot, generator, root_frame, target_frame, joint_names, trajectory_data, tags)
         return new_traj
 
-    def ExportTraj(self, trajectory, filename, compact=True):
+    def ExportTraj(self, trajectory, filename, compact=False):
         trajEL = ET.Element("trajectory", {"uid":trajectory.uid})
         infoEL = ET.SubElement(trajEL, "info", {"robot":trajectory.robot, "generator":trajectory.generator})
         [typetext, datatext, timingtext] = self._gettypeinfo(trajectory)
@@ -386,7 +388,14 @@ class XTFParser:
         if (compact):
             tree.write(filename, encoding="utf-8", xml_declaration=True)
         else:
-            tree.write(filename, encoding="utf-8", xml_declaration=True)
+            stream = StringIO.StringIO()
+            tree.write(stream, encoding="utf-8", xml_declaration=True)
+            raw_string = stream.getvalue()
+            xml = MD.parseString(raw_string)
+            pretty = xml.toprettyxml(indent="  ", encoding="utf-8")
+            xml_file = open(filename, "w")
+            xml_file.write(pretty)
+            xml_file.close()
 
 if __name__ == "__main__":
     print "Testing XTF reference library [Python]"
