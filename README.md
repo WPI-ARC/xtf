@@ -139,23 +139,23 @@ Shared API Classes
 
     Stores a single state in a trajectory, containing any (or all) of the following:
 
-    - desired position
+    1.  desired position
 
-    - desired velocity
+    2.  desired velocity
 
-    - desired acceleratiom
+    3.  desired acceleratiom
 
-    - actual position
+    4.  actual position
 
-    - actual velocity
+    5.  actual velocity
 
-    - actual acceleration
+    6.  actual acceleration
 
-    - timing (secs + nsecs)
+    7.  timing (secs + nsecs)
 
-    - sequence
+    8.  sequence
 
-    - "extras" (a fairly free-form key-value way to store additional data in a state, such as a cost value or human observation)
+    9.  "extras" (a fairly free-form key-value way to store additional data in a state, such as a cost value or human observation)
 
     Constructors:
 
@@ -182,13 +182,13 @@ Shared API Classes
 C++ Specific
 ------------
 
-    `XTF::KeyValue` - Provides a flexible storage container for all supported types of "extras". A given KeyValue object can only be one supported type at a time, and if the type changes, all previous values will be erased.
+1.  `XTF::KeyValue` - Provides a flexible storage container for all supported types of "extras". A given KeyValue object can only be one supported type at a time, and if the type changes, all previous values will be erased.
 
     Users can query the current type on a KeyValue object and request its value - however, requesting the value as a different type than currently stored will result in an exception being thrown.
 
 Python Specific
 ---------------
 
-    **None**
+**None**
 
-    Support for "extras" is provided natively by dictionaries which directly support all value types.
+Support for "extras" is provided natively by dictionaries which directly support all value types.
