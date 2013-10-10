@@ -64,20 +64,20 @@ Shared API Classes
 
     Constructors:
 
-        `XTF::Parser()` (C++)
-        `XTFParser()` (Python)
+    `XTF::Parser()` (C++)
+    `XTFParser()` (Python)
 
     Methods:
 
-        `XTF::Trajectory XTF::Parser::ParseTraj(std::string filename)` (C++)
-        `XTFTrajectory XTFParser.ParseTraj(string filename)` (Python)
+    `XTF::Trajectory XTF::Parser::ParseTraj(std::string filename)` (C++)
+    `XTFTrajectory XTFParser.ParseTraj(string filename)` (Python)
 
-        Provided a valid XTF file, the parser will return a XTF::Trajectory or XTFTrajectory object containing the parsed trajectory. If parsing fails, the parser will throw exceptions.
+    Provided a valid XTF file, the parser will return a XTF::Trajectory or XTFTrajectory object containing the parsed trajectory. If parsing fails, the parser will throw exceptions.
 
-        `bool XTF::Parser::ExportTraj(XTF::Trajectory traj, std::string filename, bool compact=false)  ` (C++)
-        `XTFParser.ExportTraj(XTFTrajectory traj, string filename, bool compact=false)` (Python)
+    `bool XTF::Parser::ExportTraj(XTF::Trajectory traj, std::string filename, bool compact=false)  ` (C++)
+    `XTFParser.ExportTraj(XTFTrajectory traj, string filename, bool compact=false)` (Python)
 
-        Provided a XTF::Trajectory or XTFTrajectory, the parser will produce an XTF file at the provided filepath. Parameter `compact` switches between compact XML (no line breaks, no indents) and human-readable XML. If the file cannot be written, the parser will throw exceptions.
+    Provided a XTF::Trajectory or XTFTrajectory, the parser will produce an XTF file at the provided filepath. Parameter `compact` switches between compact XML (no line breaks, no indents) and human-readable XML. If the file cannot be written, the parser will throw exceptions.
 
 2.  Trajectory - Provided by `XTF::Trajectory` (C++) and `XTFTrajectory` (Python)
 
@@ -85,53 +85,53 @@ Shared API Classes
 
     Constructors:
 
-        In C++, four constructors are provided:
+    In C++, four constructors are provided:
 
-        `XTF::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::string root_frame, std::string target_frame, std::vector<State> trajectory_data, std::vector<std::string> tags)`
+    `XTF::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::string root_frame, std::string target_frame, std::vector<State> trajectory_data, std::vector<std::string> tags)`
 
-        Creates a new joint-space XTF::Trajectory with existing trajectory data.
+    Creates a new joint-space XTF::Trajectory with existing trajectory data.
 
-        `XTF::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::string root_frame, std::string target_frame, std::vector<std::string> tags)`
+    `XTF::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::string root_frame, std::string target_frame, std::vector<std::string> tags)`
 
-        Creates a new joint-space XTF::Trajectory without existing trajectory data.
+    Creates a new joint-space XTF::Trajectory without existing trajectory data.
 
-        `XTF::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::vector<std::string> joint_names, std::vector<State> trajectory_data, std::vector<std::string> tags)`
+    `XTF::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::vector<std::string> joint_names, std::vector<State> trajectory_data, std::vector<std::string> tags)`
 
-        Creates a new pose-space XTF::Trajectory with existing trajectory data.
+    Creates a new pose-space XTF::Trajectory with existing trajectory data.
 
-        `XTF::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::vector<std::string> joint_names, std::vector<std::string> tags)`
+    `XTF::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::vector<std::string> joint_names, std::vector<std::string> tags)`
 
-        Creates a new pose-space XTF::Trajectory without existing trajectory data.
+    Creates a new pose-space XTF::Trajectory without existing trajectory data.
 
-        In Python, as the language lacks overloading, a single constructor is provided:
+    In Python, as the language lacks overloading, a single constructor is provided:
 
-        `XTFTrajectory(string uid, string traj_type, string timing, string data_type, string robot, string generator, string root_frame, string target_frame, string[] joint_names, XTFState[] trajectory_data, string[] tags)` (Python)
+    `XTFTrajectory(string uid, string traj_type, string timing, string data_type, string robot, string generator, string root_frame, string target_frame, string[] joint_names, XTFState[] trajectory_data, string[] tags)` (Python)
 
-        Not all parameters must be provided - *either* joint_names with data_type="joint" *or* root_frame and target_frame with data_type="pose" must be provided. All list paramters may be provided as empty lists [].
+    Not all parameters must be provided - *either* `joint_names` with `data_type="joint"` *or* `root_frame` and `target_frame` with `data_type="pose"` must be provided. All list paramters may be provided as empty lists [].
 
     Methods:
 
-        Both C++ and Python classes override the "to string" operator (<< in C++, __str__() in Python)
+    Both C++ and Python classes override the "to string" operator (<< in C++, __str__() in Python)
 
-        **The C++ API provides a limited set of functions with no Python equivalent to mathc a subset of the behavior of std::vector**
+    **The C++ API provides a limited set of functions with no Python equivalent to match a subset of the behavior of std::vector**
 
-        `XTF::Trajectory::push_back(XTF::State val)`
+    `XTF::Trajectory::push_back(XTF::State val)`
 
-        Wraps the push_back() call of the underlying data structure, with an added safety check to make sure # of joint names in the trajectory and number of joint values in the new state match.
+    Wraps the push_back() call of the underlying data structure, with an added safety check to make sure # of joint names in the trajectory and number of joint values in the new state match.
 
-        `XTF::Trajectory::size()`
+    `XTF::Trajectory::size()`
 
-        Wraps the size() call of the underlying data structure.
+    Wraps the size() call of the underlying data structure.
 
-        `XTF::Trajectory::at(size_t idx)`
+    `XTF::Trajectory::at(size_t idx)`
 
-        Wraps the at() call of the underlying data structure.
+    Wraps the at() call of the underlying data structure.
 
-        `XTF::Trajectory::operator[](size_t idx)`
+    `XTF::Trajectory::operator[](size_t idx)`
 
-        Allows direct indexing into the underlying data structure.
+    Allows direct indexing into the underlying data structure.
 
-        **The Python interface provides no additional functions**
+    **The Python interface provides no additional functions**
 
 3.  State - Provided by `XTF::State` (C++) and `XTFState` (Python)
 
@@ -157,25 +157,25 @@ Shared API Classes
 
     Constructors:
 
-        `XTF::State(std::vector<double> desiredP, std::vector<double> desiredV, std::vector<double> desiredA, std::vector<double> actualP, std::vector<double> actualV, std::vector<double> actualA, int sequence, timespec timing)` (C++)
+    `XTF::State(std::vector<double> desiredP, std::vector<double> desiredV, std::vector<double> desiredA, std::vector<double> actualP, std::vector<double> actualV, std::vector<double> actualA, int sequence, timespec timing)` (C++)
 
-        All std::vector parameters must either have zero elements or the same size. Different numbers of elements will result in an exception being thrown.
+    All std::vector parameters must either have zero elements or the same size. Different numbers of elements will result in an exception being thrown.
 
-        `XTFState(float[] desiredP, float[] desiredV, float[] desiredA, float[] actualP, float[] actualV, float[] actualA, int sequence, timing)` (Python)
+    `XTFState(float[] desiredP, float[] desiredV, float[] desiredA, float[] actualP, float[] actualV, float[] actualA, int sequence, timing)` (Python)
 
-        All list parameters must either have zero elements or the same size. Different numbers of elements will result in an exception being thrown. Parameter `timing` may either be a list/tuple of (int secs, int nsecs) or (float secs).
+    All list parameters must either have zero elements or the same size. Different numbers of elements will result in an exception being thrown. Parameter `timing` may either be a list/tuple of (int secs, int nsecs) or (float secs).
 
     Methods:
 
-        Both C++ and Python classes override the "to string" operator (<< in C++, __str__() in Python)
+    Both C++ and Python classes override the "to string" operator (<< in C++, __str__() in Python)
 
-        **The C++ API provides a single additional function to overcome a limit in std::map**
+    **The C++ API provides a single additional function to overcome a limit in std::map**
 
-        `std::vector<std::string> XTF::State::ListExtras()`
+    `std::vector<std::string> XTF::State::ListExtras()`
 
-        Returns a list of the keys for the "extras" stored in the state. This function is provided because std::map provides no way to query the currently present keys.
+    Returns a list of the keys for the "extras" stored in the state. This function is provided because std::map provides no way to query the currently present keys.
 
-        **The Python interface provides no additional functions**
+    **The Python interface provides no additional functions**
 
 C++ Specific
 ------------
