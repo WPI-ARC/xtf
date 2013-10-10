@@ -32,6 +32,8 @@ protected:
     std::vector<long> int_list_;
     std::vector<std::string> str_list_;
 
+    void Zero();
+
 public:
 
     KeyValue(bool value);
@@ -227,7 +229,7 @@ public:
 
     Trajectory ParseTraj(std::string filename);
 
-    bool ExportTraj(Trajectory trajectory, std::string filename, bool compact=true);
+    bool ExportTraj(Trajectory trajectory, std::string filename, bool compact=false);
 
 };
 

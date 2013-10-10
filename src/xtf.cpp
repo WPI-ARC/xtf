@@ -15,50 +15,70 @@ using namespace XTF;
 
 KeyValue::KeyValue(bool value)
 {
+    Zero();
     type_ = BOOLEAN;
     bool_val_ = value;
 }
 
 KeyValue::KeyValue(long value)
 {
+    Zero();
     type_ = INTEGER;
     int_val_ = value;
 }
 
 KeyValue::KeyValue(double value)
 {
+    Zero();
     type_ = DOUBLE;
     flt_val_ = value;
 }
 
 KeyValue::KeyValue(std::string value)
 {
+    Zero();
     type_ = STRING;
     str_val_ = value;
 }
 
 KeyValue::KeyValue(std::vector<bool> value)
 {
+    Zero();
     type_ = BOOLEANLIST;
     bool_list_ = value;
 }
 
 KeyValue::KeyValue(std::vector<long> value)
 {
+    Zero();
     type_ = INTEGERLIST;
     int_list_ = value;
 }
 
 KeyValue::KeyValue(std::vector<double> value)
 {
+    Zero();
     type_ = DOUBLELIST;
     flt_list_ = value;
 }
 
 KeyValue::KeyValue(std::vector<std::string> value)
 {
+    Zero();
     type_ = STRINGLIST;
     str_list_ = value;
+}
+
+void KeyValue::Zero()
+{
+    bool_val_ = false;
+    flt_val_ = 0.0;
+    int_val_ = 0;
+    str_val_.clear();
+    bool_list_.clear();
+    flt_list_.clear();
+    int_list_.clear();
+    str_list_.clear();
 }
 
 KeyValue::TYPES KeyValue::Type()

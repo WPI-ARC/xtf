@@ -154,7 +154,9 @@ class XTFTrajectory:
                 self.target_frame = target_frame
             else:
                 raise AttributeError("No target frame provided for pose-space trajectory")
-        if (self.data_type == self.JOINT and trajectory_data[0]._data_length == len(self.joint_names)):
+        if (self.data_type == self.JOINT and len(trajectory_data) > 0 and trajectory_data[0]._data_length == len(self.joint_names)):
+            self.trajectory = trajectory_data
+        elif (self.data_type == self.JOINT and len(trajectory_data) == 0):
             self.trajectory = trajectory_data
         elif (self.data_type == self.POSE):
             self.trajectory = trajectory_data
