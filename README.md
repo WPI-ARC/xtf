@@ -70,11 +70,13 @@ Shared API Classes
     Methods:
 
     `XTF::Trajectory XTF::Parser::ParseTraj(std::string filename)` (C++)
+    
     `XTFTrajectory XTFParser.ParseTraj(string filename)` (Python)
 
     Provided a valid XTF file, the parser will return a XTF::Trajectory or XTFTrajectory object containing the parsed trajectory. If parsing fails, the parser will throw exceptions.
 
-    `bool XTF::Parser::ExportTraj(XTF::Trajectory traj, std::string filename, bool compact=false)  ` (C++)
+    `bool XTF::Parser::ExportTraj(XTF::Trajectory traj, std::string filename, bool compact=false)` (C++)
+    
     `XTFParser.ExportTraj(XTFTrajectory traj, string filename, bool compact=false)` (Python)
 
     Provided a XTF::Trajectory or XTFTrajectory, the parser will produce an XTF file at the provided filepath. Parameter `compact` switches between compact XML (no line breaks, no indents) and human-readable XML. If the file cannot be written, the parser will throw exceptions.
