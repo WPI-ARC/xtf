@@ -157,6 +157,14 @@ Shared API Classes
 
     9.  "extras" (a fairly free-form key-value way to store additional data in a state, such as a cost value or human observation)
 
+    Retrieving "extras":
+    
+    `XTF::KeyValue value = XTF::State.extras_[key];` (C++)
+    
+    `value = XTFState.extras[key]` (Python)
+    
+    In both languages, extras are retrieved by name from a key-value store (std::map in C++, dictionary in Python). Available keys can be queried in Python by `string[] keys = dict.keys()` and in C++ by `std::vector<std::string> keys = XTF::State.ListExtras()`
+
     Constructors:
 
     `XTF::State(std::vector<double> desiredP, std::vector<double> desiredV, std::vector<double> desiredA, std::vector<double> actualP, std::vector<double> actualV, std::vector<double> actualA, int sequence, timespec timing)` (C++)
