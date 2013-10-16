@@ -9,6 +9,8 @@ catkin_python_setup()
 catkin_package(INCLUDE_DIRS include LIBRARIES ${PROJECT_NAME} CATKIN_DEPENDS roscpp rospy DEPENDS system_lib LibXML++)
 ## Include both default Catkin headers and LibXML++ headers
 include_directories(include ${catkin_INCLUDE_DIRS} ${LibXML++_INCLUDE_DIRS})
+## Enable debug symbols
+set(CMAKE_CXX_FLAGS "-g")
 ## Declare a cpp library
 add_library(${PROJECT_NAME} src/xtf.cpp)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${LibXML++_LIBRARIES})

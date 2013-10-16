@@ -709,14 +709,19 @@ Trajectory Parser::ParseTraj(std::string filename)
             }
             // Get the tags
             std::vector<std::string> tags;
-            xmlpp::ContentNode* tagsText = dynamic_cast<xmlpp::ContentNode*>(tagsEL->get_children().front());
-            if (tagsText && !tagsText->is_white_space())
+            // First, we need to check that current file actually has tags
+            xmlpp::Node* tagN = tagsEL->get_children().front();
+            if (tagN != NULL && (tagsEL->get_children().size() > 0))
             {
-                tags = ReadStrings(tagsText->get_content());
-            }
-            else
-            {
-                throw std::invalid_argument("XTF file is malformed or otherwise corrupted");
+                xmlpp::ContentNode* tagsText = dynamic_cast<xmlpp::ContentNode*>(tagN);
+                if (tagsText != NULL && !tagsText->is_white_space())
+                {
+                    tags = ReadStrings(tagsText->get_content());
+                }
+                else
+                {
+                    //throw std::invalid_argument("XTF file is malformed or otherwise corrupted");
+                }
             }
             ////////////////////////////////////////////////////////////////////////////////
             /* Read the trajectory data */

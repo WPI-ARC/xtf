@@ -32,7 +32,10 @@ class XTFState:
         self._verify_size(actualA)
         self.acceleration_actual = actualA
         self.sequence = sequence
-        if (len(timing) == 2):
+        if (type(timing) == type(0.0)):
+            self.secs = int(math.floor(timing))
+            self.nsecs = int((timing - math.floor(timing)) * 1000000000)
+        elif (len(timing) == 2):
             self.secs = timing[0]
             self.nsecs = timing[1]
         elif (len(timing) == 1):
