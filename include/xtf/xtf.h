@@ -21,7 +21,7 @@ class KeyValue
 
 protected:
 
-    enum TYPES {BOOLEAN, INTEGER, DOUBLE, STRING, BOOLEANLIST, INTEGERLIST, DOUBLELIST, STRINGLIST};
+    enum TYPES {KV_BOOLEAN, KV_INTEGER, KV_DOUBLE, KV_STRING, KV_BOOLEANLIST, KV_INTEGERLIST, KV_DOUBLELIST, KV_STRINGLIST};
     TYPES type_;
     bool bool_val_;
     double flt_val_;
@@ -171,11 +171,11 @@ public:
     {
     }
 
-    void push_back(State val);
+    void push_back(State& val);
 
-    State at(size_t idx);
+    State& at(size_t idx);
 
-    State operator[](size_t idx);
+    State& operator[](size_t idx);
 
     size_t size();
 

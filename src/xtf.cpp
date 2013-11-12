@@ -16,56 +16,56 @@ using namespace XTF;
 KeyValue::KeyValue(bool value)
 {
     Zero();
-    type_ = BOOLEAN;
+    type_ = KV_BOOLEAN;
     bool_val_ = value;
 }
 
 KeyValue::KeyValue(long value)
 {
     Zero();
-    type_ = INTEGER;
+    type_ = KV_INTEGER;
     int_val_ = value;
 }
 
 KeyValue::KeyValue(double value)
 {
     Zero();
-    type_ = DOUBLE;
+    type_ = KV_DOUBLE;
     flt_val_ = value;
 }
 
 KeyValue::KeyValue(std::string value)
 {
     Zero();
-    type_ = STRING;
+    type_ = KV_STRING;
     str_val_ = value;
 }
 
 KeyValue::KeyValue(std::vector<bool> value)
 {
     Zero();
-    type_ = BOOLEANLIST;
+    type_ = KV_BOOLEANLIST;
     bool_list_ = value;
 }
 
 KeyValue::KeyValue(std::vector<long> value)
 {
     Zero();
-    type_ = INTEGERLIST;
+    type_ = KV_INTEGERLIST;
     int_list_ = value;
 }
 
 KeyValue::KeyValue(std::vector<double> value)
 {
     Zero();
-    type_ = DOUBLELIST;
+    type_ = KV_DOUBLELIST;
     flt_list_ = value;
 }
 
 KeyValue::KeyValue(std::vector<std::string> value)
 {
     Zero();
-    type_ = STRINGLIST;
+    type_ = KV_STRINGLIST;
     str_list_ = value;
 }
 
@@ -88,55 +88,63 @@ KeyValue::TYPES KeyValue::Type()
 
 void KeyValue::SetValue(bool value)
 {
-    type_ = BOOLEAN;
+    Zero();
+    type_ = KV_BOOLEAN;
     bool_val_ = value;
 }
 
 void KeyValue::SetValue(long value)
 {
-    type_ = INTEGER;
+    Zero();
+    type_ = KV_INTEGER;
     int_val_ = value;
 }
 
 void KeyValue::SetValue(double value)
 {
-    type_ = DOUBLE;
+    Zero();
+    type_ = KV_DOUBLE;
     flt_val_ = value;
 }
 
 void KeyValue::SetValue(std::string value)
 {
-    type_ = STRING;
+    Zero();
+    type_ = KV_STRING;
     str_val_ = value;
 }
 
 void KeyValue::SetValue(std::vector<bool> value)
 {
-    type_ = BOOLEANLIST;
+    Zero();
+    type_ = KV_BOOLEANLIST;
     bool_list_ = value;
 }
 
 void KeyValue::SetValue(std::vector<long> value)
 {
-    type_ = INTEGERLIST;
+    Zero();
+    type_ = KV_INTEGERLIST;
     int_list_ = value;
 }
 
 void KeyValue::SetValue(std::vector<double> value)
 {
-    type_ = DOUBLELIST;
+    Zero();
+    type_ = KV_DOUBLELIST;
     flt_list_ = value;
 }
 
 void KeyValue::SetValue(std::vector<std::string> value)
 {
-    type_ = STRINGLIST;
+    Zero();
+    type_ = KV_STRINGLIST;
     str_list_ = value;
 }
 
 bool KeyValue::BoolValue()
 {
-    if (type_ == BOOLEAN)
+    if (type_ == KV_BOOLEAN)
     {
         return bool_val_;
     }
@@ -148,7 +156,7 @@ bool KeyValue::BoolValue()
 
 long KeyValue::IntegerValue()
 {
-    if (type_ == INTEGER)
+    if (type_ == KV_INTEGER)
     {
         return int_val_;
     }
@@ -160,7 +168,7 @@ long KeyValue::IntegerValue()
 
 double KeyValue::DoubleValue()
 {
-    if (type_ == DOUBLE)
+    if (type_ == KV_DOUBLE)
     {
         return flt_val_;
     }
@@ -172,7 +180,7 @@ double KeyValue::DoubleValue()
 
 std::string KeyValue::StringValue()
 {
-    if (type_ == STRING)
+    if (type_ == KV_STRING)
     {
         return str_val_;
     }
@@ -184,7 +192,7 @@ std::string KeyValue::StringValue()
 
 std::vector<bool> KeyValue::BoolListValue()
 {
-    if (type_ == BOOLEANLIST)
+    if (type_ == KV_BOOLEANLIST)
     {
         return bool_list_;
     }
@@ -196,7 +204,7 @@ std::vector<bool> KeyValue::BoolListValue()
 
 std::vector<long> KeyValue::IntegerListValue()
 {
-    if (type_ == INTEGERLIST)
+    if (type_ == KV_INTEGERLIST)
     {
         return int_list_;
     }
@@ -208,7 +216,7 @@ std::vector<long> KeyValue::IntegerListValue()
 
 std::vector<double> KeyValue::DoubleListValue()
 {
-    if (type_ == DOUBLELIST)
+    if (type_ == KV_DOUBLELIST)
     {
         return flt_list_;
     }
@@ -220,7 +228,7 @@ std::vector<double> KeyValue::DoubleListValue()
 
 std::vector<std::string> KeyValue::StringListValue()
 {
-    if (type_ == STRINGLIST)
+    if (type_ == KV_STRINGLIST)
     {
         return str_list_;
     }
@@ -233,35 +241,35 @@ std::vector<std::string> KeyValue::StringListValue()
 std::string KeyValue::GetValueString()
 {
     std::ostringstream strm;
-    if (type_ == BOOLEAN)
+    if (type_ == KV_BOOLEAN)
     {
         strm << PrettyPrintBool(bool_val_);
     }
-    else if (type_ == INTEGER)
+    else if (type_ == KV_INTEGER)
     {
         strm << int_val_;
     }
-    else if (type_ == DOUBLE)
+    else if (type_ == KV_DOUBLE)
     {
         strm << flt_val_;
     }
-    else if (type_ == STRING)
+    else if (type_ == KV_STRING)
     {
         strm << str_val_;
     }
-    else if (type_ == BOOLEANLIST)
+    else if (type_ == KV_BOOLEANLIST)
     {
         strm << PrettyPrintBool(bool_list_);
     }
-    else if (type_ == INTEGERLIST)
+    else if (type_ == KV_INTEGERLIST)
     {
         strm << PrettyPrint(int_list_);
     }
-    else if (type_ == DOUBLELIST)
+    else if (type_ == KV_DOUBLELIST)
     {
         strm << PrettyPrint(flt_list_);
     }
-    else if (type_ == STRINGLIST)
+    else if (type_ == KV_STRINGLIST)
     {
         strm << PrettyPrint(str_list_);
     }
@@ -270,35 +278,35 @@ std::string KeyValue::GetValueString()
 
 std::string KeyValue::GetTypeString()
 {
-    if (type_ == BOOLEAN)
+    if (type_ == KV_BOOLEAN)
     {
         return std::string("boolean");
     }
-    else if (type_ == INTEGER)
+    else if (type_ == KV_INTEGER)
     {
         return std::string("integer");
     }
-    else if (type_ == DOUBLE)
+    else if (type_ == KV_DOUBLE)
     {
         return std::string("double");
     }
-    else if (type_ == STRING)
+    else if (type_ == KV_STRING)
     {
         return std::string("string");
     }
-    else if (type_ == BOOLEANLIST)
+    else if (type_ == KV_BOOLEANLIST)
     {
         return std::string("booleanlist");
     }
-    else if (type_ == INTEGERLIST)
+    else if (type_ == KV_INTEGERLIST)
     {
         return std::string("integerlist");
     }
-    else if (type_ == DOUBLELIST)
+    else if (type_ == KV_DOUBLELIST)
     {
         return std::string("doublelist");
     }
-    else if (type_ == STRINGLIST)
+    else if (type_ == KV_STRINGLIST)
     {
         return std::string("stringlist");
     }
@@ -474,7 +482,7 @@ size_t Trajectory::size()
     return trajectory_.size();
 }
 
-void Trajectory::push_back(State val)
+void Trajectory::push_back(State& val)
 {
     if (joint_names_.size() != val.data_length_)
     {
@@ -486,7 +494,7 @@ void Trajectory::push_back(State val)
     }
 }
 
-State Trajectory::at(size_t idx)
+State& Trajectory::at(size_t idx)
 {
     if (idx < trajectory_.size())
     {
@@ -500,7 +508,7 @@ State Trajectory::at(size_t idx)
     }
 }
 
-State Trajectory::operator[](size_t idx)
+State& Trajectory::operator[](size_t idx)
 {
     if (idx < trajectory_.size())
     {
