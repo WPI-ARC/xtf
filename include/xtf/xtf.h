@@ -155,13 +155,13 @@ public:
     TRAJTYPES traj_type_;
     DATATYPES data_type_;
 
-    Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::string root_frame, std::string target_frame, std::vector<State> trajectory_data, std::vector<std::string> tags);
+    Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, std::string robot, std::string generator, std::string root_frame, std::string target_frame, std::vector<State> trajectory_data, std::vector<std::string> tags);
 
-    Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::vector<std::string> joint_names, std::vector<State> trajectory_data, std::vector<std::string> tags);
+    Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, std::string robot, std::string generator, std::vector<std::string> joint_names, std::vector<State> trajectory_data, std::vector<std::string> tags);
 
-    Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::string root_frame, std::string target_frame, std::vector<std::string> tags);
+    Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, std::string robot, std::string generator, std::string root_frame, std::string target_frame, std::vector<std::string> tags);
 
-    Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::vector<std::string> joint_names, std::vector<std::string> tags);
+    Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, std::string robot, std::string generator, std::vector<std::string> joint_names, std::vector<std::string> tags);
 
     Trajectory()
     {

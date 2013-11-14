@@ -411,7 +411,7 @@ std::ostream& operator<<(std::ostream& strm, State& state)
     return strm;
 }
 
-Trajectory::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::string root_frame, std::string target_frame, std::vector<State> trajectory_data, std::vector<std::string> tags)
+Trajectory::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, std::string robot, std::string generator, std::string root_frame, std::string target_frame, std::vector<State> trajectory_data, std::vector<std::string> tags)
 {
     robot_ = robot;
     uid_ = uid;
@@ -419,33 +419,40 @@ Trajectory::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DAT
     root_frame_ = root_frame;
     target_frame_ = target_frame;
     tags_ = tags;
-    data_type_ = data_type;
+    data_type_ = Trajectory::POSE;
     traj_type_ = traj_type;
     timing_ = timing;
     trajectory_ = trajectory_data;
+    for (size_t index = 0; index < trajectory_.size(); index++)
+    {
+        if (trajectory_[index].data_length_ != 7)
+        {
+            throw std::invalid_argument("Pose data is not 7 doubles [X,Y,Z,X,Y,Z,W]");
+        }
+    }
 }
 
-Trajectory::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::vector<std::string> joint_names, std::vector<State> trajectory_data, std::vector<std::string> tags)
+Trajectory::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, std::string robot, std::string generator, std::vector<std::string> joint_names, std::vector<State> trajectory_data, std::vector<std::string> tags)
 {
     robot_ = robot;
     uid_ = uid;
     generator_ = generator;
     joint_names_ = joint_names;
     tags_ = tags;
-    data_type_ = data_type;
+    data_type_ = Trajectory::JOINT;
     traj_type_ = traj_type;
     timing_ = timing;
     trajectory_ = trajectory_data;
-    if (joint_names_.size() > 0 && trajectory_.size() > 0)
+    for (size_t index = 0; index < trajectory_.size(); index++)
     {
-        if (joint_names_.size() != trajectory_[0].data_length_)
+        if (trajectory_[index].data_length_ != joint_names_.size())
         {
             throw std::invalid_argument("Inconsistent joint names and joint data");
         }
     }
 }
 
-Trajectory::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::string root_frame, std::string target_frame, std::vector<std::string> tags)
+Trajectory::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, std::string robot, std::string generator, std::string root_frame, std::string target_frame, std::vector<std::string> tags)
 {
     robot_ = robot;
     uid_ = uid;
@@ -453,28 +460,21 @@ Trajectory::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DAT
     root_frame_ = root_frame;
     target_frame_ = target_frame;
     tags_ = tags;
-    data_type_ = data_type;
+    data_type_ = Trajectory::POSE;
     traj_type_ = traj_type;
     timing_ = timing;
 }
 
-Trajectory::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, DATATYPES data_type, std::string robot, std::string generator, std::vector<std::string> joint_names, std::vector<std::string> tags)
+Trajectory::Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, std::string robot, std::string generator, std::vector<std::string> joint_names, std::vector<std::string> tags)
 {
     robot_ = robot;
     uid_ = uid;
     generator_ = generator;
     joint_names_ = joint_names;
     tags_ = tags;
-    data_type_ = data_type;
+    data_type_ = Trajectory::JOINT;
     traj_type_ = traj_type;
     timing_ = timing;
-    if (joint_names_.size() > 0 && trajectory_.size() > 0)
-    {
-        if (joint_names_.size() != trajectory_[0].data_length_)
-        {
-            throw std::invalid_argument("Inconsistent joint names and joint data");
-        }
-    }
 }
 
 size_t Trajectory::size()
@@ -484,9 +484,13 @@ size_t Trajectory::size()
 
 void Trajectory::push_back(State& val)
 {
-    if (joint_names_.size() != val.data_length_)
+    if (data_type_ == Trajectory::JOINT && (val.data_length_ != joint_names_.size()))
     {
         throw std::invalid_argument("Inconsistent joint names and joint data");
+    }
+    else if (data_type_ == Trajectory::POSE && (val.data_length_ != 7))
+    {
+        throw std::invalid_argument("Pose data is not 7 doubles [X,Y,Z,X,Y,Z,W]");
     }
     else
     {
@@ -846,12 +850,12 @@ Trajectory Parser::ParseTraj(std::string filename)
             // Assemble the trajectory
             if (data_type == Trajectory::JOINT)
             {
-                Trajectory new_traj(uid, traj_type, timing, data_type, robot, generator, joint_names, trajectory_data, tags);
+                Trajectory new_traj(uid, traj_type, timing, robot, generator, joint_names, trajectory_data, tags);
                 return new_traj;
             }
             else if (data_type == Trajectory::POSE)
             {
-                Trajectory new_traj(uid, traj_type, timing, data_type, robot, generator, root_frame, target_frame, trajectory_data, tags);
+                Trajectory new_traj(uid, traj_type, timing, robot, generator, root_frame, target_frame, trajectory_data, tags);
                 return new_traj;
             }
             else

@@ -15,7 +15,7 @@ import re
 import math
 import StringIO
 
-class XTFState:
+class XTFState(object):
 
     def __init__(self, desiredP, desiredV, desiredA, actualP, actualV, actualA, sequence, timing):
         self._data_length = 0
@@ -117,7 +117,7 @@ class XTFState:
             state_str += "\nkey: " + key + " type: " + self._get_type(value) + " value: " + self._get_value(value)
         return state_str
 
-class XTFTrajectory:
+class XTFTrajectory(object):
 
     JOINT = 'joint'
     POSE = 'pose'
@@ -197,7 +197,7 @@ class XTFTrajectory:
             traj_str += "\n---\n" + str(state)
         return traj_str
 
-class XTFParser:
+class XTFParser(object):
 
     def __init__(self):
         self.decimal_regex = re.compile(r'[^\d.-]+')
