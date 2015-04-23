@@ -12,7 +12,7 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${LibXML++_INCLUDE_DIRS})
 ## Enable debug symbols
 set(CMAKE_CXX_FLAGS "-g")
 ## Declare a cpp library
-add_library(${PROJECT_NAME} src/xtf.cpp)
+add_library(${PROJECT_NAME} include/${PROJECT_NAME}/xtf.hpp src/${PROJECT_NAME}/xtf.cpp)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${LibXML++_LIBRARIES})
 add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 ## Mark library for installation

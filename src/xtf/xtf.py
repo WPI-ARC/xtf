@@ -53,30 +53,32 @@ class XTFState(object):
                 raise AttributeError("Inconsistent trajectory state fields")
 
     def _get_type(self, extra):
-        if (type(extra) == type(True)):
+        if (type(extra) == bool):
             return "boolean"
-        elif (type(extra) == type(1)):
+        elif (type(extra) == int):
             return "integer"
-        elif (type(extra) == type(1.0)):
+        elif (type(extra) == float):
             return "double"
-        elif (type(extra) == type("")):
+        elif (type(extra) == str):
             return "string"
-        elif (type(extra) == type([])):
+        elif (type(extra) == list):
             if (len(extra) == 0):
                 return "stringlist"
             else:
-                if (type(extra[0]) == type(True)):
+                if (type(extra[0]) == bool):
                     return "booleanlist"
-                elif (type(extra[0]) == type(1)):
+                elif (type(extra[0]) == int):
                     return "integerlist"
-                elif (type(extra[0]) == type(1.0)):
+                elif (type(extra[0]) == float):
                     return "doublelist"
-                elif (type(extra[0]) == type("")):
+                elif (type(extra[0]) == str):
                     return "stringlist"
                 else:
-                    raise AttributeError("Invalid extra type")
+                    raise AttributeError("Invalid extra type: " + str(type(extra[0])))
+        elif (extra == None):
+            return "string"
         else:
-            raise AttributeError("Invalid extra type")
+            raise AttributeError("Invalid extra type: " + str(type(extra)))
 
     def _get_value(self, value):
         if (type(value) == type([])):
@@ -251,7 +253,6 @@ class XTFParser(object):
         inted = []
         for chunk in chunks:
             try:
-                chunk = self.decimal_regex.sub('', chunk)
                 inted.append(int(float(chunk)))
             except:
                 pass
@@ -265,7 +266,6 @@ class XTFParser(object):
         floated = []
         for chunk in chunks:
             try:
-                chunk = self.decimal_regex.sub('', chunk)
                 floated.append(float(chunk))
             except:
                 pass

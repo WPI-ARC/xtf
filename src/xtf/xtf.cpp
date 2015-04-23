@@ -9,7 +9,7 @@
 #include <stdexcept>
 #include <typeinfo>
 #include <libxml++/libxml++.h>
-#include "xtf/xtf.h"
+#include "xtf/xtf.hpp"
 
 using namespace XTF;
 

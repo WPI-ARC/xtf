@@ -52,13 +52,7 @@ public:
 
     KeyValue(std::vector<std::string> value);
 
-    KeyValue()
-    {
-    }
-
-    ~KeyValue()
-    {
-    }
+    KeyValue() {}
 
     TYPES Type();
 
@@ -121,13 +115,7 @@ public:
 
     State(std::vector<double> desiredP, std::vector<double> desiredV, std::vector<double> desiredA, std::vector<double> actualP, std::vector<double> actualV, std::vector<double> actualA, int sequence, timespec timing);
 
-    State()
-    {
-    }
-
-    ~State()
-    {
-    }
+    State() {}
 
     std::vector<std::string> ListExtras();
 
@@ -163,13 +151,7 @@ public:
 
     Trajectory(std::string uid, TRAJTYPES traj_type, TIMINGS timing, std::string robot, std::string generator, std::vector<std::string> joint_names, std::vector<std::string> tags);
 
-    Trajectory()
-    {
-    }
-
-    ~Trajectory()
-    {
-    }
+    Trajectory() {}
 
     void push_back(State& val);
 
@@ -218,14 +200,7 @@ protected:
 
 public:
 
-    Parser()
-    {
-        ;
-    }
-
-    ~Parser()
-    {
-    }
+    Parser() {}
 
     Trajectory ParseTraj(std::string filename);
 
