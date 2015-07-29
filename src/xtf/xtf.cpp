@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <typeinfo>
 #include <libxml++/libxml++.h>
+#include <arc_utilities/pretty_print.hpp>
 #include "xtf/xtf.hpp"
 
 using namespace XTF;
@@ -243,7 +244,7 @@ std::string KeyValue::GetValueString()
     std::ostringstream strm;
     if (type_ == KV_BOOLEAN)
     {
-        strm << PrettyPrintBool(bool_val_);
+        strm << PrettyPrint::PrettyPrint(bool_val_);
     }
     else if (type_ == KV_INTEGER)
     {
@@ -259,19 +260,19 @@ std::string KeyValue::GetValueString()
     }
     else if (type_ == KV_BOOLEANLIST)
     {
-        strm << PrettyPrintBool(bool_list_);
+        strm << PrettyPrint::PrettyPrint(bool_list_);
     }
     else if (type_ == KV_INTEGERLIST)
     {
-        strm << PrettyPrint(int_list_);
+        strm << PrettyPrint::PrettyPrint(int_list_);
     }
     else if (type_ == KV_DOUBLELIST)
     {
-        strm << PrettyPrint(flt_list_);
+        strm << PrettyPrint::PrettyPrint(flt_list_);
     }
     else if (type_ == KV_STRINGLIST)
     {
-        strm << PrettyPrint(str_list_);
+        strm << PrettyPrint::PrettyPrint(str_list_);
     }
     return strm.str();
 }
@@ -918,7 +919,7 @@ bool Parser::ExportTraj(Trajectory trajectory, std::string filename, bool compac
     {
         type->set_attribute("data_type", "joint");
         xmlpp::Element* joint_names = type->add_child("joint_names");
-        joint_names->set_child_text(PrettyPrint(trajectory.joint_names_));
+        joint_names->set_child_text(PrettyPrint::PrettyPrint(trajectory.joint_names_));
     }
     else if (trajectory.data_type_ == Trajectory::POSE)
     {
@@ -934,34 +935,34 @@ bool Parser::ExportTraj(Trajectory trajectory, std::string filename, bool compac
     }
     // -- Make tag block
     xmlpp::Element* tags = info->add_child("tags");
-    tags->set_child_text(PrettyPrint(trajectory.tags_));
+    tags->set_child_text(PrettyPrint::PrettyPrint(trajectory.tags_));
     // - Make state block
     xmlpp::Element* states = root->add_child("states");
-    states->set_attribute("length", PrettyPrint(trajectory.trajectory_.size()));
+    states->set_attribute("length", PrettyPrint::PrettyPrint(trajectory.trajectory_.size()));
     // -- Make states
     for (unsigned int i = 0; i < trajectory.trajectory_.size(); i++)
     {
         State current = trajectory.trajectory_[i];
         xmlpp::Element* state = states->add_child("state");
-        state->set_attribute("sequence", PrettyPrint(current.sequence_));
-        state->set_attribute("secs", PrettyPrint(current.timing_.tv_sec));
-        state->set_attribute("nsecs", PrettyPrint(current.timing_.tv_nsec));
+        state->set_attribute("sequence", PrettyPrint::PrettyPrint(current.sequence_));
+        state->set_attribute("secs", PrettyPrint::PrettyPrint(current.timing_.tv_sec));
+        state->set_attribute("nsecs", PrettyPrint::PrettyPrint(current.timing_.tv_nsec));
         // --- Make state fields
         xmlpp::Element* desired = state->add_child("desired");
         xmlpp::Element* actual = state->add_child("actual");
         // ---- Fill in the state fields
         xmlpp::Element* dp = desired->add_child("position");
-        dp->set_child_text(PrettyPrint(current.position_desired_));
+        dp->set_child_text(PrettyPrint::PrettyPrint(current.position_desired_));
         xmlpp::Element* dv = desired->add_child("velocity");
-        dv->set_child_text(PrettyPrint(current.velocity_desired_));
+        dv->set_child_text(PrettyPrint::PrettyPrint(current.velocity_desired_));
         xmlpp::Element* da = desired->add_child("acceleration");
-        da->set_child_text(PrettyPrint(current.acceleration_desired_));
+        da->set_child_text(PrettyPrint::PrettyPrint(current.acceleration_desired_));
         xmlpp::Element* ap = actual->add_child("position");
-        ap->set_child_text(PrettyPrint(current.position_actual_));
+        ap->set_child_text(PrettyPrint::PrettyPrint(current.position_actual_));
         xmlpp::Element* av = actual->add_child("velocity");
-        av->set_child_text(PrettyPrint(current.velocity_actual_));
+        av->set_child_text(PrettyPrint::PrettyPrint(current.velocity_actual_));
         xmlpp::Element* aa = actual->add_child("acceleration");
-        aa->set_child_text(PrettyPrint(current.acceleration_actual_));
+        aa->set_child_text(PrettyPrint::PrettyPrint(current.acceleration_actual_));
         std::map<std::string, KeyValue>::iterator itr;
         for(itr = current.extras_.begin(); itr != current.extras_.end(); ++itr)
         {
@@ -981,55 +982,6 @@ bool Parser::ExportTraj(Trajectory trajectory, std::string filename, bool compac
         trajXTF.write_to_file_formatted(filename, "utf-8");
     }
     return true;
-}
-
-std::string PrettyPrintBool(std::vector<bool> vectoprint)
-{
-    std::ostringstream strm;
-    if (vectoprint.size() > 0)
-    {
-        strm << PrettyPrintBool(vectoprint[0]);
-        for (unsigned int i = 1; i < vectoprint.size(); i++)
-        {
-            strm << ", " << PrettyPrintBool(vectoprint[i]);
-        }
-    }
-    return strm.str();
-}
-
-template <typename T>
-std::string PrettyPrint(std::vector<T> vectoprint)
-{
-    std::ostringstream strm;
-    if (vectoprint.size() > 0)
-    {
-        strm << PrettyPrint(vectoprint[0]);
-        for (unsigned int i = 1; i < vectoprint.size(); i++)
-        {
-            strm << ", " << PrettyPrint(vectoprint[i]);
-        }
-    }
-    return strm.str();
-}
-
-std::string PrettyPrintBool(bool toprint)
-{
-    if (toprint)
-    {
-        return std::string("true");
-    }
-    else
-    {
-        return std::string("false");
-    }
-}
-
-template <typename T>
-std::string PrettyPrint(T toprint)
-{
-    std::ostringstream strm;
-    strm << toprint;
-    return strm.str();
 }
 
 std::vector<bool> Parser::ReadBools(std::string strtovec)

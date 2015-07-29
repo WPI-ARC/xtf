@@ -210,16 +210,6 @@ public:
 
 }
 
-std::string PrettyPrintBool(std::vector<bool> vectoprint);
-
-template <typename T>
-std::string PrettyPrint(std::vector<T> vectoprint);
-
-std::string PrettyPrintBool(bool toprint);
-
-template <typename T>
-std::string PrettyPrint(T toprint);
-
 std::ostream& operator<<(std::ostream& strm, XTF::KeyValue& keyvalue);
 
 std::ostream& operator<<(std::ostream& strm, XTF::State& state);
